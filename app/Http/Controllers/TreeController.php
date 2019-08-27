@@ -895,7 +895,7 @@ class TreeController extends Controller {
         $irrigation_list = $this->irrigation_list();
         $header = array($bom.'果树种类','基地名称','横排','纵排','总价','重量');
         foreach ($irrigation_list as $key => $value) {
-            array_push($header, $bom.$value->name);
+            array_push($header,$value->name);
         }
         fputcsv($file, $header);
         // 样本数据，这可以从MySQL中获取
@@ -924,9 +924,39 @@ class TreeController extends Controller {
         $params = $this->getAngularjsParam(true);
         $res['ret'] = 0;
         $res['msg'] = 'ok';
-        dd($params);
+        $file_info = isset($params['singlePic'])?$params['singlePic']:null; 
+        if ($file_info) {
+                $result = UploadTools::upload_file("csv", $file_info);
+                if ($result['ret'] != 0) {
+                        $res['ret'] = -2;
+                        $res['msg'] = $result['msg'];
+                        goto END;
+                }
+                $this->mysql_csv($result['fileurl']);
+        }else{
+            $res['ret'] = 1;
+            $res['msg'] = '请上传模板文件'; 
+            goto END;
+        } 
     END:
         return Response::json($res); 
+    }
+
+    public function mysql_csv($filename)
+    {
+        $file = fopen(getenv('APP_URL').$filename, "r");
+        while (!feof($file)) {
+            $data[] = fgetcsv($file);
+        }
+        $data = eval('return ' . iconv('gbk', 'utf-8', var_export($data, true)) . ';');
+        dd($data);
+        foreach ($data as $key => $value) {
+            if (!$value) {
+               unset($data[$key]);
+            }
+        }
+        fclose($file);
+        return $data;
     }
 
 
