@@ -40,7 +40,9 @@
       <div class="box box-info">
         <div class="box-header">
           <h3 class="box-title">果树列表</h3>
-          <button type="button" class="btn btn-primary pull-right" ng-click="treeListEditModel(null)">新增果树</button>
+          
+          <button type="button" class="btn btn-primary pull-right" ng-click="uploadModel(null)">批量导入</button>
+          <button type="button" class="btn btn-primary pull-right" style="margin-right: 20px;" ng-click="treeListEditModel(null)">新增果树</button>
         </div>
         <!-- /.box-header -->
         <div class="box-body">
@@ -95,6 +97,39 @@
     </div>
   </div>
 </section>
+
+
+
+<script type="text/ng-template" id="uploadModel.html">
+  <form name="operationForm" ng-submit="submitForm(operationForm.$valid)" class="form-horizontal" novalidate>
+    <div class="modal-header">
+        <h3 class="modal-title">批量导入</h3>
+    </div>
+    <div class="modal-body">
+      <div class="box-body">
+        <div class="form-group">
+          <label class="col-sm-2 control-label">模板下载</label>
+          <div class="col-sm-10">
+              <button class="btn btn-primary" type="button" ng-click="uploaddown()">模板下载(每次批量导入时都要重新下载模板)</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-sm-2 control-label">文件</label>
+          <div class="col-sm-10">
+              <input type="file" value="" class="file" ng-model="singlePic" multiple-file-select="data" file-loaded="myLoaded()" file-error="myError($error)" file-progress="myProgress($total,$loaded)" multiple>
+          </div>
+        </div>            
+
+      </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-disabled="operationForm.$invalid || save_spinner_display" ng-click="confirm()">确定</button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">取消</button>
+    </div>
+  </form>
+</script>
+
 
 
 <script type="text/ng-template" id="treeListEditModel.html">

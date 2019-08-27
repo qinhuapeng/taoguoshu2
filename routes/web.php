@@ -76,6 +76,8 @@ Route::any('api/tree/tree_list_add', 'TreeController@tree_list_add');
 Route::any('api/tree/tree_list_edit', 'TreeController@tree_list_edit');
 Route::any('api/tree/tree_list_remove', 'TreeController@tree_list_remove');
 Route::any('api/tree/tree_scale_list', 'TreeController@tree_scale_list');
+Route::any('api/tree/down_csv', 'TreeController@down_csv');
+Route::any('api/tree/uploadcsv', 'TreeController@uploadcsv');
 
 //用户列表
 Route::any('api/customer/customer_list', 'CustomerController@customer_list');

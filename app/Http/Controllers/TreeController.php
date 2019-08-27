@@ -774,19 +774,19 @@ class TreeController extends Controller {
                         
                         if($params['type'] == 'add'){
                             if($val->scale_w == $scale_val['num']){
-                                // unset($base_tabs[$key]->scale_list[$val->scale_w-1]['child'][$val->scale_h]-1);
+                                unset($base_tabs[$key]->scale_list[$val->scale_w-1]['child'][$val->scale_h-1]);
                                 
                             }
                         }else{
-                            if($val->scale_w == $scale_val['num'] && $val->scale_w != $params['treelist']['scale_h']){
-                                dd('1111');
+                            if($val->scale_w == $scale_val['num'] && $val->scale_h != $params['treelist']['scale_h']){
                                 unset($base_tabs[$key]->scale_list[$val->scale_w-1]['child'][$val->scale_h-1]);
+                                $base_tabs[$key]->scale_list[$val->scale_w-1]['child'] = array_values($base_tabs[$key]->scale_list[$val->scale_w-1]['child']);
                             }
                         }
                         
                     }
                 }
-                $base_tabs[$key]->scale_list[$val->scale_w-1]['child'] = array_values($base_tabs[$key]->scale_list[$val->scale_w-1]['child']);
+                
             }
         }
         $res['data'] = $base_tabs;
@@ -862,7 +862,7 @@ class TreeController extends Controller {
         }
         
 
-         $params['treelist']['id'] = DB::table('tree_list')->where('id',$params['treelist']['id'])->update($sqlData);
+         DB::table('tree_list')->where('id',$params['treelist']['id'])->update($sqlData);
          $params['treelist']['curing_proportion'] = $params['irrigation'];
          $params['treelist']['is_delete'] = 1;
          $params['treelist']['status'] = 1;
@@ -873,6 +873,61 @@ class TreeController extends Controller {
         return Response::json($res);  
     }
 
+
+    public function down_csv()
+    {
+        $params = $this->getAngularjsParam(true);
+        $res['ret'] = 0;
+        $res['msg'] = 'ok';
+        $filename = "tree.csv";
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="'.$filename);
+        header('Cache-Control: max-age=0');
+        //直接输出到浏览器
+        $fp = fopen('php://output', 'a');
+        //在写入的第一个字符串开头加 bom。
+        $bom =  chr(0xEF).chr(0xBB).chr(0xBF);
+
+
+        // 创建并打开“tree.csv”文件进行写入
+        $file = fopen($filename, 'w');
+        // 保存列标题
+        $irrigation_list = $this->irrigation_list();
+        $header = array($bom.'果树种类','基地名称','横排','纵排','总价','重量');
+        foreach ($irrigation_list as $key => $value) {
+            array_push($header, $bom.$value->name);
+        }
+        fputcsv($file, $header);
+        // 样本数据，这可以从MySQL中获取
+        // $data = array(
+        //     array('Data 11', 'Data 12', 'Data 13', 'Data 14', 'Data 15'),
+        //     array('Data 21', 'Data 22', 'Data 23', 'Data 24', 'Data 25'),
+        //     array('Data 31', 'Data 32', 'Data 33', 'Data 34', 'Data 35'),
+        //     array('Data 41', 'Data 42', 'Data 43', 'Data 44', 'Data 45'),
+        //     array('Data 51', 'Data 52', 'Data 53', 'Data 54', 'Data 55')
+        // );
+        // // 保存每一行数据
+        // foreach ($data as $row)
+        // {
+        //     fputcsv($file, $row);
+        // }
+        // 关闭文件
+        fclose($file);
+        $res['data'] = "/".$filename;
+    END:
+        return Response::json($res); 
+    }
+
+
+    public function uploadcsv()
+    {
+        $params = $this->getAngularjsParam(true);
+        $res['ret'] = 0;
+        $res['msg'] = 'ok';
+        dd($params);
+    END:
+        return Response::json($res); 
+    }
 
 
 

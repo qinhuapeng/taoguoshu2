@@ -81,7 +81,7 @@ angular.module('myApp').controller('TreeListCtrl', function($scope, TreeListServ
         
         modalInstance.result.then(function (response) {
             if (treelist) {
-                
+                console.log(JSON.stringify(response));
                 angular.forEach($scope.list, function(value,key,array) {
                     if(response.id == value.id){
                         $scope.list[key] = response;
@@ -119,6 +119,23 @@ angular.module('myApp').controller('TreeListCtrl', function($scope, TreeListServ
             });
         }, function(){
 
+        });
+    }
+
+
+    $scope.uploadModel = function(uploadinfo)
+    {
+        var modalInstance = $uibModal.open({
+            templateUrl: 'uploadModel.html',
+            controller: 'uploadModelCtrl',
+            size: "md",
+            resolve: {
+                uploadinfo: function() { return angular.copy(uploadinfo); },
+            }
+        });
+        
+        modalInstance.result.then(function (response) {
+            
         });
     }
 
@@ -184,6 +201,23 @@ angular.module('myApp').controller('TreeListCtrl', function($scope, TreeListServ
         return $http.post(url, data);
     };
 
+    var down_csv = function()
+    {
+        var url = '/api/tree/down_csv';
+        var data = {};
+        return $http.post(url, data);
+    };
+
+    var uploadcsv = function(singlePic)
+    {
+        var url = '/api/tree/uploadcsv';
+        var data = {};
+        if(singlePic != undefined && singlePic.file != undefined){
+            data.singlePic = {"data":singlePic.data,"file_name":singlePic.file.name,"file_size":singlePic.file.size,"type":singlePic.file.type};
+        }
+        return $http.post(url, data);
+    }
+
     
     return {
         getDada: function (search,currentPage,itemsPerPage) {
@@ -213,8 +247,56 @@ angular.module('myApp').controller('TreeListCtrl', function($scope, TreeListServ
         irrigation_set: function () {
             return irrigation_set();
         },
+        down_csv: function () {
+            return down_csv();
+        },
+        uploadcsv: function (singlePic) {
+            return uploadcsv(singlePic);
+        },
     };
 }]);
+
+
+
+
+angular.module('myApp').controller('uploadModelCtrl', function ($scope, uploadinfo,TreeListService, $uibModalInstance) {
+
+    $scope.uploaddown = function()
+    {
+        TreeListService.down_csv().success(function (response) {
+            if(response.ret == 0){
+                window.open(response.data);
+            }
+        });
+    }
+
+    $scope.confirm = function()
+    {   
+        $scope.save_spinner_display = true;
+        TreeListService.uploadcsv($scope.singlePic).success(function (response) {
+            if(response.ret == 0) {
+                var res = {};
+                res = response.data;
+                $uibModalInstance.close(res);
+            } else {
+                layer.msg(response.msg);
+            }
+            $scope.save_spinner_display = false;
+        });
+  
+    }
+    //cancel事件
+    $scope.cancel = function () {
+        $uibModalInstance.dismiss('cancel');
+    };
+
+    
+})
+
+
+
+
+
 
 
 
@@ -347,12 +429,14 @@ angular.module('myApp').controller('treeListEditModelCtrl', function ($scope, tr
     $scope.get_address_h  = function(newValue,oldValue)
     {
         $scope.scale_h_list = [];
+        
         angular.forEach($scope.scale_w_list,function(value,key,array){
             if(value.id == newValue.id){
-                $scope.scale_h_list = value.child;
-                console.log(JSON.stringify($scope.scale_h_list));
+                angular.forEach(value.child,function(val,k,arr){
+                   $scope.scale_h_list.push({'id':val.id,'num':val.num}); 
+                });
+                
                 $scope.treelist.scale_h = $scope.scale_h;
-                console.log(JSON.stringify($scope.scale_h));
             }
         });
         
