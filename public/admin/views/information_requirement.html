@@ -1,0 +1,172 @@
+<section class="content-header">
+  <h1>
+    信息发布
+    <small>需求信息</small>
+  </h1>
+<!--       <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+    <li class="active">Dashboard</li>
+  </ol> -->
+</section>
+<!-- Main content -->
+<section class="content" >
+
+  <div class="row" style="margin-top:20px;">
+    <div class="col-xs-12">
+      <div class="qhp-col-xs-2">
+          <select selector model="itemsPerPage_index" options="itemsPerPage_list" value-attr="id" label-attr="name" multi="false" change="get_itemsPerPage_num(newValue,oldValue)"></select>
+      </div>
+      <div class="qhp-col-xs-2">
+          <select selector model="search.is_shenhe" options="shenhe_list" value-attr="id" label-attr="name" placeholder="请选择审核状态" require="true"></select>
+      </div>
+      <div class="qhp-col-xs-2">
+          <select selector model="search.type" options="type_list" value-attr="id" label-attr="name" placeholder="请选择交易类型" require="true"></select>
+      </div>
+      <div class="qhp-col-xs-2">
+          <select selector model="search.transaction_status" options="transaction_status_list" value-attr="id" label-attr="name" placeholder="请选择发货状态" require="true"></select>
+      </div>
+
+      <div class="qhp-col-xs-2">
+        <button class="btn btn-primary" type="button" ng-click="query_click()"><i class="fa fa-search"></i>查询</button>
+      </div>
+    
+    </div>
+  </div>
+    
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="box box-info">
+        <div class="box-header">
+          <h3 class="box-title">需求信息</h3>
+
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+          <table id="example2" class="table table-bordered table-hover">
+            <thead>
+            <tr>
+              <th>发布人</th>
+              <th>信息类型</th>
+              <th>发布信息</th>
+              <th>换购信息</th>
+              <th>发布时间</th>
+              <th>交易时间</th>
+              <th>备注</th>
+              <th>审核情况</th>
+              <th>审核人/时间</th>
+              <th>交易人/时间</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat = "row in list">
+              <td>{{row.nickName}}<br>{{row.phone}}</td>
+              <td>{{type_map[row.type]}}</td>
+              <td>
+                  {{row.have_tree_name}} [{{row.have_num}}斤]
+              </td>
+              <td>
+                  <div class="col-xs-12" ng-if="row.type == 1">{{row.need_tree_name}} [{{row.need_num}}斤]</div>
+              </td>
+              <td>{{row.creattime}}</td>
+              <td><div class="col-xs-12" ng-if="row.transaction_openid != 0">{{row.transaction_time}}</div></td>
+              <td>{{row.summary}}</td>
+              <td>{{shenhe_map[row.is_shenhe]}}<i class="fa fa-file-text pull-right" ng-if="row.shenhe_summary!=''"></i></td>
+              <td><div class="col-xs-12" ng-if="row.admin_id != 0">{{row.admin_name}}/{{row.shenhe_time}}</div></td>
+              <td><div class="col-xs-12" ng-if="row.transaction_openid != 0">{{row.transaction_nickName}}/{{row.transaction_time}}</div></td>
+              <td>{{transaction_status_map[row.transaction_status]}}<i class="fa fa-file-text pull-right" ng-if="row.fahuo_summary!=''"></i></td>
+              <td>
+                  <div class="btn-group">
+                    <button type="button" class="btn btn-success">操作</button>
+                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+                      <span class="caret"></span>
+                      <span class="sr-only">Toggle Dropdown</span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                      <li><a ng-click="shenheModal(row)">审核</a></li>
+                      <li><a ng-click="fahuoModal(row)">发货</a></li>
+                    </ul>
+                  </div>
+              </td>
+            </tr>
+            </tbody>      
+          </table>
+          <div class="dataTables_paginate paging_simple_numbers pull-right">
+            <ul class="pagination"><uib-pagination class="paginate_button" first-text="首页" last-text="末页" next-text="下页" previous-text="上页" boundary-links="true" boundary-link-numbers="true" total-items="totalItems" ng-model="currentPage" items-per-page="itemsPerPage" max-size="5" ng-change="pageChanged()">
+            </uib-pagination>
+            </ul>
+        </div>
+        </div>
+      </div>
+      <!-- /.box -->
+    </div>
+  </div>
+</section>
+
+
+
+
+<script type="text/ng-template" id="fahuoModal.html">
+  <form name="operationForm" ng-submit="submitForm(operationForm.$valid)" class="form-horizontal" novalidate>
+    <div class="modal-header">
+        <h3 class="modal-title">发货信息</h3>
+    </div>
+    <div class="modal-body">
+      <div class="box-body">
+        <div class="form-group">
+          <label class="col-sm-2 control-label">发货状态</label>
+
+          <div class="col-sm-10" style="padding:5px 0 0 0">　
+            <input type="radio" value="1" ng-model="fahuo.transaction_status"> 取消发货　　
+            <input type="radio" value="2" ng-model="fahuo.transaction_status"> 发货
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">备注</label>
+
+          <div class="col-sm-10">
+            <textarea class="form-control" ng-model="fahuo.fahuo_summary" style="height: 100px"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-disabled="operationForm.$invalid || save_spinner_display" ng-click="confirm()">确定</button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">取消</button>
+    </div>
+  </form>
+</script>
+
+
+
+<script type="text/ng-template" id="shenheModal.html">
+  <form name="operationForm" ng-submit="submitForm(operationForm.$valid)" class="form-horizontal" novalidate>
+    <div class="modal-header">
+        <h3 class="modal-title">信息审核</h3>
+    </div>
+    <div class="modal-body">
+      <div class="box-body">
+        <div class="form-group">
+          <label class="col-sm-2 control-label">审核状态</label>
+
+          <div class="col-sm-10" style="padding:5px 0 0 0">　
+            <input type="radio" value="3" ng-model="shenhe.is_shenhe"> 审核通过　
+            <input type="radio" value="4" ng-model="shenhe.is_shenhe"> 不通过
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">备注</label>
+
+          <div class="col-sm-10">
+            <textarea class="form-control" ng-model="shenhe.shenhe_summary" style="height: 100px"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-disabled="operationForm.$invalid || save_spinner_display" ng-click="confirm()">确定</button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">取消</button>
+    </div>
+  </form>
+</script>

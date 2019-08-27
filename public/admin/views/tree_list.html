@@ -1,0 +1,177 @@
+<section class="content-header">
+  <h1>
+    果树库
+    <small>果树列表</small>
+  </h1>
+<!--       <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+    <li class="active">Dashboard</li>
+  </ol> -->
+</section>
+<!-- Main content -->
+<section class="content" >
+
+  <div class="row" style="margin-top:20px;">
+    <div class="col-xs-12">
+      <div class="qhp-col-xs-2">
+          <select selector model="itemsPerPage_index" options="itemsPerPage_list" value-attr="id" label-attr="name" multi="false" change="get_itemsPerPage_num(newValue,oldValue)"></select>
+      </div>
+      <div class="qhp-col-xs-2">
+          <select selector model="search.catagory_id" options="tree_catagory_list" value-attr="id" label-attr="name" placeholder="请选择果树种类" require="true"></select>
+      </div>
+      <div class="qhp-col-xs-2">
+          <select selector model="search.base_id" options="tree_base_list" value-attr="id" label-attr="name" placeholder="请选择基地" require="true"></select>
+      </div>
+      <div class="qhp-col-xs-2">
+          <select selector model="search.is_delete" options="is_delete_list" value-attr="id" label-attr="name" placeholder="请选择偷取状态" require="true"></select>
+      </div>
+      <div class="qhp-col-xs-2">
+          <select selector model="search.status" options="status_list" value-attr="id" label-attr="name" placeholder="请选择果树状态" require="true"></select>
+      </div>
+
+      <div class="qhp-col-xs-2">
+        <button class="btn btn-primary" type="button" ng-click="query_click()"><i class="fa fa-search"></i>查询</button>
+      </div>
+    </div>
+  </div>
+    
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="box box-info">
+        <div class="box-header">
+          <h3 class="box-title">果树列表</h3>
+          <button type="button" class="btn btn-primary pull-right" ng-click="treeListEditModel(null)">新增果树</button>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+          <table id="example2" class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>果树图片</th>
+                <th>果树类别</th>
+                <th>基地名称</th>
+                <th>位置</th>
+                <th>总价</th>
+                <th>重量</th>
+                <th>偷取状态</th>
+                <th>果树状态</th>
+                <th>养护比例</th>
+                <th class="align-center hide-on-mobile-portrait">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat = "row in list">
+
+                <td>{{row.id}}</td>
+                <td><img ng-src="{{row.pic_path}}" class="qhp-td-img-70-70"/></td>
+                <td>{{row.catagory_name}}</td>
+                
+                <td>{{row.base_name}}</td>
+                <td>
+                    横排：{{row.scale_w}},
+                    纵排：{{row.scale_h}}
+                </td>
+                <td>{{row.price}}</td>
+                <td>{{row.tree_weight}}</td>
+                <td>{{status_map[row.status]}}</td>
+                <td><button type="button" class="btn btn-default btn-sm" ng-click="tree_list_status_change(row)"><i class="fa fa-square {{row.is_delete == 1?'text-green':'text-red'}}"></i>
+                  </button></td>
+                <td>
+                  <div class="col-xs-12" ng-repeat="r in row.curing_proportion">{{r.name}}:{{r.num}}</div>
+                </td>
+                <td><small class="label label-info" ng-click="treeListEditModel(row)"><i class="fa fa-edit"></i>修改</small></td>
+            </tr>
+            </tbody>      
+          </table>
+          <div class="dataTables_paginate paging_simple_numbers pull-right">
+            <ul class="pagination"><uib-pagination class="paginate_button" first-text="首页" last-text="末页" next-text="下页" previous-text="上页" boundary-links="true" boundary-link-numbers="true" total-items="totalItems" ng-model="currentPage" items-per-page="itemsPerPage" max-size="5" ng-change="pageChanged()">
+            </uib-pagination>
+            </ul>
+        </div>
+        </div>
+      </div>
+      <!-- /.box -->
+    </div>
+  </div>
+</section>
+
+
+<script type="text/ng-template" id="treeListEditModel.html">
+  <form name="operationForm" ng-submit="submitForm(operationForm.$valid)" class="form-horizontal" novalidate>
+    <div class="modal-header">
+        <h3 class="modal-title">果树 新增/修改</h3>
+    </div>
+    <div class="modal-body">
+      <div class="box-body">
+        <div class="form-group">
+          <label class="col-sm-2 control-label">果树种类</label>
+          <div class="col-sm-10">
+          <select selector model="treelist.catagory_id" options="tree_catagory_list" value-attr="id" label-attr="name" placeholder="请选择果树种类" require="true"></select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-sm-2 control-label">果树基地</label>
+
+          <div class="col-sm-10">
+            <select selector model="treelist.base_id" options="tree_base_list" value-attr="id" label-attr="name" placeholder="请选择果树基地" require="true" change="get_address(newValue,oldValue)"></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">位置(横排)</label>
+
+          <div class="col-sm-10">
+            <select selector model="treelist.scale_w" options="scale_w_list" value-attr="id" label-attr="num" placeholder="请选择位置(横排)" require="true" change="get_address_h(newValue,oldValue)"></select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-sm-2 control-label">位置(纵排)</label>
+
+          <div class="col-sm-10">
+            <select selector model="treelist.scale_h" options="scale_h_list" value-attr="id" label-attr="num" placeholder="请选择位置(纵排)" require="true"></select>
+          </div>
+        </div>
+
+
+        <div class="form-group">
+          <label class="col-sm-2 control-label">斤数</label>
+
+          <div class="col-sm-10">
+            <input type="text" class="form-control" ng-model="treelist.tree_weight" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-sm-2 control-label">总价</label>
+
+          <div class="col-sm-10">
+            <input type="text" class="form-control" ng-model="treelist.price" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">养护比例</label>
+
+          <div class="col-sm-10">
+            <div class="form-group" ng-repeat = "row in irrigation_list">
+              <div class="col-sm-10">
+                <label class="col-sm-2 control-label">{{row.name}}</label>
+                <div class="col-sm-7">
+                  <input type="text" class="form-control" ng-model="$parent.irrigation[$index]" required>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+                
+
+      </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-disabled="operationForm.$invalid || save_spinner_display" ng-click="confirm()">确定</button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">取消</button>
+    </div>
+  </form>
+</script>
+

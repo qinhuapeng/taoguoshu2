@@ -1,0 +1,51 @@
+<hgroup id="main-title" class="thin">
+    <h1>权限列表</h1>
+</hgroup>
+
+<div class="with-padding">
+
+    <div class="wrapped left-icon icon-info-round">
+        请选择管理员角色，查询后，获取该角色的权限列表
+    </div>
+
+    <br>
+    <div class="twelve-columns twelve-columns-mobile qhp-margin-5">
+        <fieldset class="fieldset">
+            <legend class="legend">查询条件</legend>
+
+            <p class="button-height inline-label">
+                <label for="input-3">角色 </label>
+                <select class="select" ng-model="usersinfo.role_id" ng-options="v.id as v.name for v in roleList" required>
+                    <option value="">请选择管理员角色</option>
+                </select>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <button type="submit" class="button glossy mid-margin-right" ng-click="role_select_jurisdiction()">
+                    <span class="button-icon"><span class="icon-search"></span></span>
+                    <span>查询</span>
+                </button>
+                <img src="/library/assets/img/standard/loaders/loading32_anthracite.gif" ng-show="init_spinner_display" class="qhp-right">
+            </p>
+        </fieldset>
+        
+    </div>
+
+    <div class="twelve-columns twelve-columns-mobile qhp-margin-5">
+        <fieldset class="fieldset " ng-repeat="row in list">
+            <legend class="legend">{{row.name}}</legend>
+            <p>
+                <span>
+                    <input type="checkbox" name="checkbox-1"  value="{{row.id}}" ng-checked="selectOne_{{row.id}}" ng-click="only(row)"> <label for="checkbox" class="label"><b>{{row.name}}</b></label>　　
+                </span>
+                <span ng-repeat="r in row['child']">
+                    <input type="checkbox" name="checkbox-1"  value="{{r.id}}" ng-checked="selectOne_{{r.id}}" ng-click="only(r)"> <label for="checkbox" class="label">{{r.name}}</label>　　
+                </span>
+            </p>
+        </fieldset>
+
+        <a class="button" ng-disabled="btn_spinner_display" ng-click="confirm()" style="float: right;">
+            <span class="button-icon green-gradient"><span class="icon-download"></span></span>
+            保存
+        </a>
+    </div>
+
+

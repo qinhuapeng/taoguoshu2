@@ -1,0 +1,93 @@
+<section class="content-header">
+  <h1>
+    基本配置
+    <small>养护产品</small>
+  </h1>
+  
+</section>
+<!-- Main content -->
+<section class="content" >
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="box box-info">
+        <div class="box-header">
+          <h3 class="box-title">养护产品</h3>
+          <button type="button" class="btn btn-primary pull-right" ng-click="irrigationEditModel(null)">新增养护产品</button>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+          <table id="example2" class="table table-bordered table-hover">
+            <thead>
+            <tr>
+              <th>ID</th>
+              <th>养护产品名称</th>
+              <th>养护一次需要天数</th>
+              <th>图片</th>
+              <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat = "row in list">
+              <td>{{row.id}}</td>
+              <td>{{row.name}}</td>
+              <td>{{row.day}}</td>
+              <td><img ng-src="{{row.pic_path}}" class="qhp-td-img-70"></td>
+              <td>
+                <small class="label label-info" ng-click="irrigationEditModel(row)"><i class="fa fa-edit"></i>修改</small>
+              </td>
+            </tr>
+            </tbody>      
+          </table>
+        </div>
+        <!-- /.box-body -->
+      </div>
+      <!-- /.box -->
+    </div>
+  </div>
+
+</section>
+
+
+
+
+<script type="text/ng-template" id="irrigationEditModel.html">
+  <form name="operationForm" ng-submit="submitForm(operationForm.$valid)" class="form-horizontal" novalidate>
+    <div class="modal-header">
+        <h3 class="modal-title">养护产品 新增/修改</h3>
+    </div>
+    <div class="modal-body">
+      <div class="box-body">
+        <div class="form-group">
+          <label class="col-sm-3 control-label">养护产品名称</label>
+
+          <div class="col-sm-9">
+            <input type="text" class="form-control" ng-model="irrigation.name" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-3 control-label">养护天数</label>
+
+          <div class="col-sm-9">
+            <input type="text" class="form-control" ng-model="irrigation.day" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-3 control-label">产品图片</label>
+
+          <div class="col-sm-9">
+            <input type="file" class="file" ng-model="singlePic" single-file-select="data" file-loaded="myLoaded()" file-error="myError($error)" file-progress="myProgress($total,$loaded)">
+                <div style="margin:20px 0">
+                    <img ng-if="singlePic.data" src="{{singlePic.data}}" class="qhp-td-img-70">
+                </div>
+                <small class="label pull-left bg-red">图片建议为：正方形图片，小于100KB</small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-disabled="operationForm.$invalid || save_spinner_display" ng-click="confirm()">确定</button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">取消</button>
+    </div>
+  </form>
+</script>

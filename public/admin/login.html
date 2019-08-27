@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>淘果树后台管理系统</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <!-- Bootstrap 3.3.7 -->
+  <link rel="stylesheet" href="/library/AdminLTE-3.0.0/bower_components/bootstrap/dist/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/library/AdminLTE-3.0.0/bower_components/font-awesome/css/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="/library/AdminLTE-3.0.0/bower_components/Ionicons/css/ionicons.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="/library/AdminLTE-3.0.0/dist/css/AdminLTE.min.css">
+  <!-- iCheck -->
+  <link rel="stylesheet" href="/library/AdminLTE-3.0.0/plugins/iCheck/square/blue.css">
+  <link href="/library/AdminLTE-3.0.0/plugins/googleapis/googleapis.css" rel="stylesheet">
+  <style type="text/css">
+  html{
+    background: url('/library/images/logo.jpg');
+    background-repeat:no-repeat ;
+        background-size:100% 100%;
+        background-attachment: fixed;"
+  }
+  body{
+    background: rgba(0,0,0,0)
+  }
+  .login-page, .register-page,.login-card-body, .register-card-body,.card{
+    background: rgba(0,0,0,0)
+  }
+  .login-box, .register-box {
+      margin: 20% auto;
+  }
+  .fa, .fab, .fal, .far, .fas{
+    color: #ffffff
+  }
+  .login-logo a{
+      font-size: 24px;
+      font-weight: 300;
+      margin-bottom: 0px;
+      text-align: center;
+      color: #ffffff;
+      letter-spacing: 2px;
+  }
+  .card {
+      box-shadow: 0 0 1px rgba(0,0,0,0), 0 1px 3px rgba(0,0,0,0);
+  }
+  .ng-cloak{display:none;}  
+ </style>
+</head>
+<body class="hold-transition login-page ng-cloak"  ng-app="loginApp" ng-controller="LoginCtrl">
+<div class="login-box">
+  <div class="login-logo">
+    <a>淘果树后台管理系统</a>
+  </div>
+  <!-- /.login-logo -->
+  <div class="login-box-body">
+    <!-- <p class="login-box-msg">Sign in to start your session</p> -->
+
+    <form method="post">
+      <div class="form-group has-feedback">
+        <input type="text" class="form-control" placeholder="账号" ng-model="username" ng-focus="clean_input()">
+        <span class="glyphicon glyphicon-user form-control-feedback"></span>
+      </div>
+      <div class="form-group has-feedback">
+        <input type="password" class="form-control" placeholder="密码" ng-model="password" ng-focus="clean_input()">
+        <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+      </div>
+      <div class="row">
+        <!-- /.col -->
+        <div class="col-xs-12">
+          <button type="button" class="btn btn-primary btn-block btn-flat" ng-disabled="login_spinner_display" ng-click="login()">登 录</button>
+        </div>
+        <!-- /.col -->
+      </div>
+      <div ng-if ="err_msg.length > 0" class="alert alert-danger alert-dismissible" style="margin-top: 20px;">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        <span><i class="icon fas fa-ban"></i> <span>{{err_msg}}</span></span>
+      </div>
+    </form>
+    
+  </div>
+  <!-- /.login-box-body -->
+</div>
+<!-- /.login-box -->
+
+<!-- jQuery 3 -->
+<script src="/library/AdminLTE-3.0.0/bower_components/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap 3.3.7 -->
+<script src="/library/AdminLTE-3.0.0/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- iCheck -->
+<script src="/library/AdminLTE-3.0.0/plugins/iCheck/icheck.min.js"></script>
+<script src="/library/angular/angular.min.js"></script>
+<script src="/library/angular/angular-cookies.min.js"></script>
+<script>
+    var app = angular.module('loginApp', ['ngCookies']);
+    app.controller('LoginCtrl', function($scope, $cookieStore, LoginService, $window) {
+      $scope.login_flag = false;
+      $scope.err_msg = "";
+        $scope.login = function() {
+                var user = $.trim($scope.username),
+                pass = $.trim($scope.password);
+                if(user.length === 0){
+                  $scope.err_msg = "请输入您的账号";
+                }
+                
+                if (pass.length === 0)
+                {
+                    $scope.err_msg = '请输入您的密码';
+                }
+                if($scope.err_msg.length == 0){
+                  $scope.login_spinner_display = true;
+                  LoginService.login($scope.username, $scope.password).success(function (data) {
+                      if(data.ret == 0) {
+                          $cookieStore.put("username", $scope.username);
+                          $cookieStore.put("userid", data.userid);
+                          $cookieStore.put("rolename", data.role_name);
+                          
+                          $window.localStorage["access"]=JSON.stringify(data.access);
+                          window.location = "/admin/index.html#/overview";
+                      } else {
+                          $scope.login_spinner_display = false;
+                          $scope.err_msg = data.msg;
+                      }
+                  }).error(function (error, status) {
+                      $scope.login_spinner_display = false;
+                  }); 
+                }                       
+        };
+
+        $scope.clean_input = function(){
+          $scope.err_msg = "";
+          return false;
+        }
+
+
+        $scope.search_keypress = function (event) {
+            if(event.keyCode == 13) {
+                $scope.login();
+            }
+        }
+
+    }).service('LoginService', ['$http', function ($http) {
+        var login = function (username, password) {
+            var url = '/api/users/login';
+            var data = {username:username,password:password};
+            return $http.post(url, data);
+        };
+        return {
+            login: function (username, password) {
+                return login(username, password);
+            }
+        };
+    }])
+</script>
+</body>
+</html>

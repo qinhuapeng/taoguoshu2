@@ -1,0 +1,48 @@
+<hgroup id="main-title" class="thin">
+    <h1>管理员角色修改</h1>
+</hgroup>
+
+<div class="with-padding">
+
+    <div class="wrapped left-icon icon-reply">
+        <span class="qhp-come-back" onclick="javascript:history.back()">返回上一页</span>
+    </div>
+
+    <!-- <h4>Styled table with simple sorting</h4>
+    <p>Simple sorting and manual controls if you prefer to handle the table output server-side:</p>
+    <p><b>Tip:</b> try clicking on a row to show an extra line style!</p> -->
+    <br>
+
+  <form name="myForm" ng-submit="submitForm(myForm.$valid)" class="form-horizontal" novalidate>
+   <div class="twelve-columns twelve-columns-tablet">
+
+
+		<fieldset class="fieldset fields-list">
+			<!-- <div class="field-block button-height">
+				<label for="login" class="label"><b>账号</b></label>
+				<input type="text" value="" class="input" ng-model="usersinfo.name" disabled="true">
+			</div> -->
+			<div class="field-block button-height">
+				<label for="role" class="label"><b>角色</b></label>
+				<select class="select" ng-model="usersinfo.role_id" ng-options="v.id as v.name for v in roleList" required>
+					<option value="">请选择管理员角色</option>
+				</select>
+			</div>
+
+			<div class="field-block button-height">
+
+				<button type="submit" class="button glossy mid-margin-right" ng-disabled="myForm.$invalid || btn_spinner_display" ng-click="user_role_edit()">
+					<span class="button-icon"><span class="icon-tick"></span></span>
+					<span>修改</span>
+				</button>
+
+			</div>
+
+		</fieldset>
+
+	</div>
+</form>
+    
+
+</div>
+

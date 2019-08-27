@@ -1,0 +1,49 @@
+<section class="content-header">
+  <h1>
+     信息发布
+    <small>信息发布设置</small>
+  </h1>
+<!--       <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+    <li class="active">Dashboard</li>
+  </ol> -->
+</section>
+
+<!-- Main content -->
+<section class="content" >
+  <!-- Info boxes -->
+  <div class="row">
+    <div class="col-md-12">
+          <!-- Horizontal Form -->
+      <div class="box box-info">
+        <div class="box-header with-border">
+          <h3 class="box-title">信息发布设置</h3>
+        </div>
+        <!-- /.box-header -->
+        <!-- form start -->
+        <form class="form-horizontal" name="myForm" ng-submit="submitForm(myForm.$valid)" novalidate>
+          <div class="box-body">
+            <div class="form-group">
+              <label class="col-sm-4 control-label">首次登陆获取偷取果树次数</label>
+
+              <div class="col-sm-8" style="padding:5px 0 0 0">
+                <input type="radio" value="1" ng-model="information.is_shenhe"> 需要审核　　
+                <input type="radio" value="2" ng-model="information.is_shenhe"> 不审核
+              </div>
+            </div>
+          </div>
+          <!-- /.box-body -->
+          <div class="box-footer">
+            <button class="btn btn-primary pull-right" type="button" ng-disabled="operationForm.$invalid || save_spinner_display" ng-click="confirm()">确定</button>
+          </div>
+          <!-- /.box-footer -->
+        </form>
+      </div>
+    </div>
+
+    
+
+  </div>
+
+</section>
+

@@ -1,0 +1,221 @@
+<section class="content-header">
+  <h1>
+    果树库
+    <small>果树基地</small>
+  </h1>
+<!--       <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+    <li class="active">Dashboard</li>
+  </ol> -->
+</section>
+<!-- Main content -->
+<section class="content" >
+
+  <div class="row" style="margin-top:20px;">
+    <div class="col-xs-12">
+      <div class="qhp-col-xs-2">
+          <select selector model="itemsPerPage_index" options="itemsPerPage_list" value-attr="id" label-attr="name" multi="false" change="get_itemsPerPage_num(newValue,oldValue)"></select>
+      </div>
+      <div class="qhp-col-xs-2">
+          <select selector model="search.is_delete" options="base_status_map" value-attr="id" label-attr="name" placeholder="请选择基地状态" require="true"></select>
+      </div>
+      <div class="qhp-col-xs-2">
+          <input type="text" class="form-control qhp-search-input" placeholder="请输入基地名称" ng-model="search.name">
+      </div>
+
+      <div class="qhp-col-xs-2">
+        <button class="btn btn-primary" type="button" ng-click="query_click()"><i class="fa fa-search"></i>查询</button>
+      </div>
+      
+    
+    </div>
+  </div>
+    
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="box box-info">
+        <div class="box-header">
+          <h3 class="box-title">果树基地</h3>
+          <button type="button" class="btn btn-primary pull-right" ng-click="treeBaseEditModel(null)">新增果树基地</button>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+          <table id="example2" class="table table-bordered table-hover">
+            <thead>
+            <tr>
+            <th>排序</th>
+              <th>基地名称</th>
+              <th>基地标题</th>
+              <th>规模</th>
+              <th>logo</th>
+              <th>基地全貌图</th>
+              <th>种植状况图</th>
+              <th>基地详情图</th>
+              <th>简介</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat = "row in list">
+              <td><input type="text" ng-model="row.sort" style="width: 40px;height: 30px;text-align: center;border-radius: 5px;border:1px solid #dddddd;" ng-blur="base_sort(row)"></td>
+              <td>{{row.name}}</td>
+              <td>{{row.title}}</td>
+              <td>横排：{{row.scale_w}}，纵排：{{row.scale_h}}</td>
+              <td><img class="qhp-td-img-70" ng-src="{{row.base_logo}}"></td>
+              <td><img class="qhp-td-img-3-2" ng-src="{{row.full_picture}}"></td>
+              <td>
+                  <span ng-repeat="r in row.plant_picture_list" ng-click="showImg(row.plant_picture_list)"><img class="qhp-td-img-70-70 pull-left" ng-src="{{r.pic_path}}"></span>
+                  <i class="glyphicon glyphicon-file pull-right" style="color: #f39c12;" ng-click="treeBaseImgUploadModel(row,'plant')"></i>
+              </td>
+              <td>
+                  <span ng-repeat="r in row.content_picture_list" ng-click="showImg(row.content_picture_list)"><img class="qhp-td-img-70-70" ng-src="{{r.pic_path}}"></span>
+                  <i class="glyphicon glyphicon-file" style="float: right;color: #f39c12" ng-click="treeBaseImgUploadModel(row,'info')"></i>
+              </td>
+    
+              <td>{{row.summary}}</td>
+              <td><button type="button" class="btn btn-default btn-sm" ng-click="tree_base_status_change(row)"><i class="fa fa-square {{row.is_delete == 1?'text-green':'text-red'}}"></i>
+                  </button></td>
+              <td><small class="label label-info" ng-click="treeBaseEditModel(row)"><i class="fa fa-edit"></i>修改</small></td>
+            </tr>
+            </tbody>      
+          </table>
+          <div class="dataTables_paginate paging_simple_numbers pull-right">
+            <ul class="pagination"><uib-pagination class="paginate_button" first-text="首页" last-text="末页" next-text="下页" previous-text="上页" boundary-links="true" boundary-link-numbers="true" total-items="totalItems" ng-model="currentPage" items-per-page="itemsPerPage" max-size="5" ng-change="pageChanged()">
+            </uib-pagination>
+            </ul>
+        </div>
+        </div>
+      </div>
+      <!-- /.box -->
+    </div>
+  </div>
+</section>
+
+
+<script type="text/ng-template" id="treeBaseImgUploadModel.html">
+  <form name="operationForm" ng-submit="submitForm(operationForm.$valid)" class="form-horizontal" novalidate>
+    <div class="modal-header">
+        <h3 class="modal-title">图片上传</h3>
+    </div>
+    <div class="modal-body">
+      <div class="box-body">
+        <div class="form-group">
+          <label class="col-sm-2 control-label">现有图片列表</label>
+
+          <div class="col-sm-10">
+              <ul class="mailbox-attachments d-flex align-items-stretch clearfix">
+                <li ng-repeat = "row in img_list">
+                  <span class="mailbox-attachment-icon has-img"><img ng-src="{{row.pic_path}}" style="width: 100px;height: 100px;" /></span>
+                  <div class="mailbox-attachment-info">
+                    <i class="fa fa-trash-o" ng-click="remove_img(row)"></i>
+                  </div>
+                </li>
+              </ul>
+          </div>
+        </div>
+
+
+        <div class="form-group">
+          <label class="col-sm-2 control-label">请选择图片</label>
+
+          <div class="col-sm-10">
+            <input type="file" value="" class="file" ng-model="multiplePic_plant" multiple-file-select="data" file-loaded="myLoaded()" file-error="myError($error)" file-progress="myProgress($total,$loaded)" multiple>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-disabled="operationForm.$invalid || save_spinner_display" ng-click="confirm()">确定</button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">取消</button>
+    </div>
+  </form>
+</script>
+
+
+
+
+<script type="text/ng-template" id="treeBaseEditModel.html">
+  <form name="operationForm" ng-submit="submitForm(operationForm.$valid)" class="form-horizontal" novalidate>
+    <div class="modal-header">
+        <h3 class="modal-title">果树基地 新增\修改</h3>
+    </div>
+    <div class="modal-body">
+      <div class="box-body">
+        <div class="form-group">
+          <label class="col-sm-2 control-label">基地名称</label>
+
+          <div class="col-sm-10">
+            <input type="text" class="form-control" ng-model="baseinfo.name" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-sm-2 control-label">基地标题</label>
+
+          <div class="col-sm-10">
+            <input type="text" class="form-control" ng-model="baseinfo.title" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-sm-2 control-label">基地规模</label>
+
+          <div class="col-sm-10">
+            <div class="qhp-col-xs-4">
+              横排：<input type="text" class="form-control col-sm-3" ng-model="baseinfo.scale_w" required>
+            </div>
+            <div class="qhp-col-xs-4">
+              纵排：<input type="text" class="form-control col-sm-3" ng-model="baseinfo.scale_h" required>
+            </div>
+          
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-sm-2 control-label">基地简介</label>
+
+          <div class="col-sm-10">
+            <input type="text" class="form-control" ng-model="baseinfo.summary" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-sm-2 control-label">基地详情</label>
+
+          <div class="col-sm-10">
+            <div class="ueditor" ready="ready" ng-model="baseinfo.content"  style="width: 100%;height: 200px;"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">基地logo</label>
+
+          <div class="col-sm-10">
+          <input type="file" class="file" ng-model="pic.singlePic_logo" single-file-select="data" file-loaded="myLoaded()" file-error="myError($error)" file-progress="myProgress($total,$loaded)">
+              <div style="margin:20px 0">
+                  <img  ng-if="pic.singlePic_logo.data" ng-src="{{pic.singlePic_logo.data}}" style="width: 100px;height: 100px;">
+                  <img  ng-if="baseinfo.base_logo && !pic.singlePic_logo.data" ng-src="{{baseinfo.base_logo}}" style="width: 100px;height: 100px;">
+              </div>
+              <small class="label pull-left bg-red">图片长宽比例建议为：1:1</small>
+        </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">基地全貌图片</label>
+
+          <div class="col-sm-10">
+            <input type="file" class="file" ng-model="pic.singlePic_full" single-file-select="data" file-loaded="myLoaded()" file-error="myError($error)" file-progress="myProgress($total,$loaded)">
+                <div style="margin:20px 0">
+                    <img  ng-if="pic.singlePic_full.data" ng-src="{{pic.singlePic_full.data}}" style="width: 150px;height: 100px;">
+                    <img  ng-if="baseinfo.full_picture && !pic.singlePic_full.data" ng-src="{{baseinfo.full_picture}}" style="width: 150px;height: 100px;">
+                </div>
+                <small class="label pull-left bg-red">图片长宽比例建议为：3:2</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-disabled="operationForm.$invalid || save_spinner_display" ng-click="confirm()">确定</button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">取消</button>
+    </div>
+  </form>
+</script>

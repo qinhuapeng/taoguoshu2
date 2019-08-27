@@ -1,0 +1,81 @@
+<div class="row-fluid page-head">
+    <h2><i class="aweso-icon-table"></i> Websocket <small>消息推送 </small></h2>
+    <div class="page-bar">
+        <div class="btn-toolbar"> </div>
+    </div>
+</div>           
+<div id="page-content" class="page-content">
+    <section>
+        <div class="row-fluid">
+            <div class="well well-small well-nice">
+                <div class="navbar">
+                    <div class="navbar-inner">
+                        <div class="widget-header">
+                        <h4><i class="fontello-icon-edit"></i> </h4>
+                        <div class="widget-tool">
+                            <a class="btn btn-green btn-small btn-glyph" ng-click="usersModal(null)">新　增</a>
+                        </div>
+                    </div>
+                </div>
+             </div>
+             <!-- <div class="row-fluid">
+            
+	                <div class="span4 well well-nice">
+	                    <h4 class="simple-header">Right</h4>
+	                    <ul class="unstyled text-right">
+	                        <li data-type="success" data-layout="bottomRight" class="btn runner">bottom</li>
+	                    </ul>
+	                </div>
+	            </div> -->
+                <!-- // navbar -->
+            <div class="table-wrapper">
+                <table class="table boo-table table-content table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>用户名</th>
+                            <th>角色</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                       <tr ng-repeat="row in list">
+                            <td>{{row.id}}</td>
+                            <td>{{row.name}}</td>
+                            <td>{{row.role_name}}</td>
+                            <td>
+                                <i class="fontello-icon-edit" title="修改角色" ng-click="usersRoleModal(row)"></i>  
+                                <i class="fontello-icon-key" title="修改密码" ng-click="usersPasswordModal(row)"></i>  
+                                <i class="fontello-icon-trash-1" title="删除账号" ng-click="usersRemoveModal(row)"></i>
+                                <!-- <i class="fontello-icon-wrench-1" title="设置权限" ng-click="usersJurisdictionModal(row)"></i> -->
+                            </td>
+                       </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>                        
+    </section> 
+    <section>
+        <div class="row-fluid margin-bottom40">
+            <div class="span12">
+            	<div class="well well-nice">
+                    <fieldset>
+                    	<label for="formA">发送消息给：</label>
+                        <select2 ng-model="usersinfo.user_id" placeholder="请选择" s2-options="val.id as val.name for val in users_list" options="{allowClear:true}" class="control-label span6"></select2>
+                        <label for="formB">消息内容</label>
+                        <div class="input-append">
+                            <input id="formB" class="span10" type="text" ng-model="usersinfo.content">
+                            <button class="btn" type="button" ng-click="push_msg()">发送</button>
+                        </div>
+                    </fieldset>
+                </div>
+            
+        </div>
+        <!-- // Sample row Prepended and Appended -->
+    </section>     
+</div> 
+<!-- <script src="../library/assets/js/demo/demo-notification.js"></script>  -->
+<script src="../library/websocket/socket.io.js"></script>
+<script type="text/javascript">
+
+</script>

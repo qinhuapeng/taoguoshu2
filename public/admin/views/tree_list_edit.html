@@ -1,0 +1,63 @@
+<hgroup id="main-title" class="thin">
+    <h1>果树列表 增加 / 修改</h1>
+</hgroup>
+
+<div class="with-padding">
+
+    <div class="wrapped left-icon icon-reply">
+        <span class="qhp-come-back" onclick="javascript:history.back()">返回上一页</span>
+    </div>
+
+    <!-- <h4>Styled table with simple sorting</h4>
+    <p>Simple sorting and manual controls if you prefer to handle the table output server-side:</p>
+    <p><b>Tip:</b> try clicking on a row to show an extra line style!</p> -->
+    <br>
+
+  <form name="myForm" ng-submit="submitForm(myForm.$valid)" class="form-horizontal" novalidate>
+   <div class="twelve-columns twelve-columns-tablet">
+
+
+		<fieldset class="fieldset fields-list">
+
+			<div class="field-block button-height">
+				<label for="pass" class="label"><b>果树种类</b></label>
+				<select selector model="treelist.catagory_id" options="catagory_list" value-attr="id" label-attr="name" multi="false" placeholder="请选择果树种类" class="qhp-search-w250-r10"></select>
+			</div>
+			<div class="field-block button-height">
+				<label for="pass" class="label"><b>果树基地</b></label>
+				<select selector model="treelist.base_id" options="base_list" value-attr="id" label-attr="name" multi="false" placeholder="请选择果树基地" class="qhp-search-w250-r10"></select>
+			</div>
+			<div class="field-block button-height">
+				<label for="pass" class="label"><b>横排位数</b></label>
+				<select selector model="treelist.scale_w" options="scale_w_list" value-attr="id" label-attr="name" multi="false" placeholder="请选择果树横排位数" class="qhp-search-w250-r10"></select>
+			</div>
+			<div class="field-block button-height">
+				<label for="pass" class="label"><b>纵排位数</b></label>
+				<select selector model="treelist.scale_h" options="scale_h_list" value-attr="id" label-attr="name" multi="false" placeholder="请选择果树纵排位数" class="qhp-search-w250-r10"></select>
+			</div>
+
+			<div class="field-block button-height">
+				<label for="pass" class="label"><b>果树图片</b></label>
+				<input type="file" class="file" ng-model="singlePic" single-file-select="data" file-loaded="myLoaded()" file-error="myError($error)" file-progress="myProgress($total,$loaded)">
+				<div>
+					<img ng-if="singlePic" ng-src="{{singlePic.data}}" style="width: 200px;height: 200px;">
+				</div>
+				<span class="tag red-bg">图片建议为：长宽比例为1:1</span>
+			</div>
+
+			<div class="field-block button-height">
+				<button type="submit" class="button glossy mid-margin-right" ng-disabled="myForm.$invalid || btn_spinner_display" ng-click="confirm()">
+					<span class="button-icon"><span class="icon-tick"></span></span>
+					<span ng-if="id==0">新增</span>
+					<span ng-if="id!=0">修改</span>
+				</button>
+			</div>
+
+		</fieldset>
+
+	</div>
+</form>
+    
+
+</div>
+
