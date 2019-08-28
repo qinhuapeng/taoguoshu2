@@ -26,7 +26,7 @@ class HomeController extends Controller {
 
    	public $logs_path;
     function __construct() {
- 		$this->logs_path = "admin";
+ 		$this->logs_path = "home";
     }
 
 
@@ -35,6 +35,18 @@ class HomeController extends Controller {
         $params= $this->getAngularjsParam(true);
         $res['ret'] = 0;
         $res['msg'] = 'ok';
+        $day_3 = date("Y-m-d",strtotime("-3 day")); 
+        $day_7 = date("Y-m-d",strtotime("-7 day")); 
+        $day_30 = date("Y-m-d",strtotime("-30 day")); 
+        dd($day_30);
+        //获取最近3天 7天 30天的各个数据
+        $user_30 = DB::select(DB::raw("select count(id) as num,creattime from  wx_users where DATE_SUB(CURDATE(), INTERVAL 30 DAY) <= creattime group by creattime"));
+        foreach ($user_30 as $key => $value) {
+            
+        }
+
+        
+        $res['user_tabs'] = $user_30;
     END:
         return Response::json($res);
     }

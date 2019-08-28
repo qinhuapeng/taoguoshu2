@@ -15,7 +15,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 //首页统计
-Route::any('api/overview', 'HomeController@overview');
+Route::any('api/home/overview', 'HomeController@overview');
 
 //管理员登录
 Route::any('api/users/login', 'UsersController@login');
