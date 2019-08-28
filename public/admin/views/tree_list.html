@@ -59,6 +59,7 @@
                 <th>偷取状态</th>
                 <th>果树状态</th>
                 <th>养护比例</th>
+                <th>二维码</th>
                 <th class="align-center hide-on-mobile-portrait">操作</th>
             </tr>
             </thead>
@@ -82,6 +83,7 @@
                 <td>
                   <div class="col-xs-12" ng-repeat="r in row.curing_proportion">{{r.name}}:{{r.num}}</div>
                 </td>
+                <td><img ng-src="{{row.erweima}}" class="qhp-td-img-70-70"/></td>
                 <td><small class="label label-info" ng-click="treeListEditModel(row)"><i class="fa fa-edit"></i>修改</small></td>
             </tr>
             </tbody>      

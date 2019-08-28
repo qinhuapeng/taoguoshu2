@@ -183,6 +183,16 @@ class Controller extends BaseController
         return $data;
     }
 
+    public function tree_catagory_list_id()
+    {
+        $data = array();
+        $tabs = $this->tree_catagory_list();
+        foreach ($tabs as $key => $value) {
+            $data[$value->name] = $value->id;
+        }
+        return $data;
+    }
+
 
     //获取果树基地列表
     public function tree_base_list()
@@ -197,6 +207,16 @@ class Controller extends BaseController
         $tabs = $this->tree_base_list();
         foreach ($tabs as $key => $value) {
             $data[$value->id] = $value->name;
+        }
+        return $data;
+    }
+
+    public function tree_base_list_id()
+    {
+        $data = array();
+        $tabs = $this->tree_base_list();
+        foreach ($tabs as $key => $value) {
+            $data[$value->name] = $value->id;
         }
         return $data;
     }

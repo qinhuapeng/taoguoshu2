@@ -50,6 +50,10 @@ Route::any('api/setting/irrigation_set', 'SettingController@irrigation_set');
 Route::any('api/setting/get_irrigation_set_one', 'SettingController@get_irrigation_set_one');
 Route::any('api/setting/irrigation_set_edit', 'SettingController@irrigation_set_edit');
 Route::any('api/setting/irrigation_set_add', 'SettingController@irrigation_set_add');
+Route::any('api/setting/rechargeable_vouchers_list', 'SettingController@rechargeable_vouchers_list');
+Route::any('api/setting/rechargeable_vouchers_add', 'SettingController@rechargeable_vouchers_add');
+Route::any('api/setting/rechargeable_vouchers_edit', 'SettingController@rechargeable_vouchers_edit');
+Route::any('api/setting/rechargeable_vouchers_remove', 'SettingController@rechargeable_vouchers_remove');
 
 
 //我的果树
@@ -99,3 +103,9 @@ Route::any('api/common/tree_catagory_list', 'Controller@tree_catagory_list');
 Route::any('api/common/tree_base_list', 'Controller@tree_base_list');
 
 
+
+
+
+/*前端*/
+//微信
+Route::any('api/wx/get_WX_config', 'WxController@get_WX_config');

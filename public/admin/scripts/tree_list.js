@@ -81,7 +81,6 @@ angular.module('myApp').controller('TreeListCtrl', function($scope, TreeListServ
         
         modalInstance.result.then(function (response) {
             if (treelist) {
-                console.log(JSON.stringify(response));
                 angular.forEach($scope.list, function(value,key,array) {
                     if(response.id == value.id){
                         $scope.list[key] = response;
@@ -91,6 +90,8 @@ angular.module('myApp').controller('TreeListCtrl', function($scope, TreeListServ
             } else {
                 $scope.list.unshift(response);
             }
+
+
         });
     }
 
@@ -279,7 +280,23 @@ angular.module('myApp').controller('uploadModelCtrl', function ($scope, uploadin
                 res = response.data;
                 $uibModalInstance.close(res);
             } else {
-                layer.msg(response.msg);
+                if(response.err_data.length == 0){
+                    layer.msg(response.msg);
+                }else{
+                    $err = "";
+                    angular.forEach(response.err_data,function(value,key,array){
+                        $err += '<div class="col-sm-12">'+value+'</div>';
+                    });
+                    layer.open({
+                      type: 1,
+                      skin: 'layui-layer-demo', //样式类名
+                      closeBtn: 0, //不显示关闭按钮
+                      anim: 2,
+                      shadeClose: true, //开启遮罩关闭
+                      content: $err
+                    });
+                }
+                
             }
             $scope.save_spinner_display = false;
         });

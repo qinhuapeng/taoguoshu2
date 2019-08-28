@@ -23,6 +23,7 @@ use Crypt;
 use Hash;
 use App\Tools\UploadTools;
 use Illuminate\Support\Facades\Storage;
+use QrCode;
 
 class TreeController extends Controller {
 
@@ -819,6 +820,14 @@ class TreeController extends Controller {
                 $res['msg'] = "该位置已经有果树了！";
                 goto END;
         }
+
+        $cycle_tabs = DB::table('tree_cycle')->where('base_id',$sqlData['base_id'])->where('catagory_id',$sqlData['catagory_id'])->get(['*']);
+        $now = date('Y-m-d');
+        if($now > $cycle_tabs[0]->endtime || $now < $cycle_tabs[0]->starttime){
+            $res['ret'] = 1;
+                $res['msg'] = "生长周期有误！";
+                goto END;
+        }
         
 
          $params['treelist']['id'] = DB::table('tree_list')->insertGetId($sqlData);
@@ -827,6 +836,15 @@ class TreeController extends Controller {
          $params['treelist']['status'] = 1;
          $params['treelist']['catagory_name'] = DB::table('tree_catagory')->where('id',$sqlData['catagory_id'])->get(['name as catagory_name'])[0]->catagory_name;
          $params['treelist']['base_name'] = DB::table('tree_base')->where('id',$sqlData['base_id'])->get(['name as base_name'])[0]->base_name;
+
+         //生成二维码
+         $filepath = '/admin/uploads/erweima/'.date('Y-m');
+         if(!file_exists(public_path($filepath))){
+            mkdir(public_path($filepath));
+         }
+         QrCode::format('png')->size(200)->generate('http://www.baidu.com?treeid='.$params['treelist']['id'],public_path($filepath.'/'.$params['treelist']['id'].'.png'));
+         $params['treelist']['erweima'] = $filepath.'/'.$params['treelist']['id'].'.png';
+         DB::table('tree_list')->where('id',$params['treelist']['id'])->update(array('erweima'=>$params['treelist']['erweima']));
          $res['data'] = $params['treelist'];
     END:
         return Response::json($res);  
@@ -924,6 +942,7 @@ class TreeController extends Controller {
         $params = $this->getAngularjsParam(true);
         $res['ret'] = 0;
         $res['msg'] = 'ok';
+        $res['err_data'] = array();
         $file_info = isset($params['singlePic'])?$params['singlePic']:null; 
         if ($file_info) {
                 $result = UploadTools::upload_file("csv", $file_info);
@@ -932,7 +951,13 @@ class TreeController extends Controller {
                         $res['msg'] = $result['msg'];
                         goto END;
                 }
-                $this->mysql_csv($result['fileurl']);
+                $result = $this->mysql_csv($result['fileurl']);
+                if($result['ret'] != 0){
+                    $res['ret'] = 1;
+                    $res['msg'] = $result['msg']; 
+                    $res['err_data'] = $result['err_data']; 
+                    goto END;
+                }
         }else{
             $res['ret'] = 1;
             $res['msg'] = '请上传模板文件'; 
@@ -944,19 +969,92 @@ class TreeController extends Controller {
 
     public function mysql_csv($filename)
     {
+        $err_data = array();
+        $params = $this->getAngularjsParam(true);
+        $res['ret'] = 0;
+        $res['msg'] = 'ok';
+        $res['err_data'] =$err_data;
+
         $file = fopen(getenv('APP_URL').$filename, "r");
         while (!feof($file)) {
             $data[] = fgetcsv($file);
         }
         $data = eval('return ' . iconv('gbk', 'utf-8', var_export($data, true)) . ';');
-        dd($data);
+
+        $irrigation_list = $this->irrigation_list();
+        $tree_catagory_list_id = $this->tree_catagory_list_id();
+        $tree_base_list_id = $this->tree_base_list_id();
+        //先判断数据准确性
+        
         foreach ($data as $key => $value) {
-            if (!$value) {
-               unset($data[$key]);
+            $flag = true;
+            if($key == 0){
+                continue;
             }
+            $sqlData = array();
+            $sqlData['catagory_id'] = $tree_catagory_list_id[$value[0]];
+            $sqlData['base_id'] = $tree_base_list_id[$value[1]];
+
+            $cycle_tabs = DB::table('tree_cycle')->where('base_id',$sqlData['base_id'])->where('catagory_id',$sqlData['catagory_id'])->get(['*']);
+            $now = date('Y-m-d');
+            if($now > $cycle_tabs[0]->endtime || $now < $cycle_tabs[0]->starttime){
+                $flag= false;
+            }
+
+            $sqlData['scale_w'] = $value[2];
+            $sqlData['scale_h'] = $value[3];
+            $sqlData['price'] = $value[4];
+            $sqlData['tree_weight'] = $value[5];
+            $curing_proportion = array();
+            $i = 6;
+            $num = 0;
+            foreach ($irrigation_list as $k => $val) {
+                $num += $value[$k+$i];
+            }
+            if($num != 100){
+                $flag = false;
+            }
+
+            if(!$flag){
+                array_push($err_data,$value[0].'-'.$value[1].'-横排'.$value[2].'-纵排'.$value[3]);
+            }
+
         }
+        if(count($err_data) > 0){
+            $res['ret'] = -1;
+            $res['msg'] = "数据有误";
+            $res['err_data'] = $err_data;
+            return $res;
+        }
+        foreach ($data as $key => $value) {
+            if($key == 0){
+                continue;
+            }
+            $sqlData = array();
+            $sqlData['catagory_id'] = $tree_catagory_list_id[$value[0]];
+            $sqlData['base_id'] = $tree_base_list_id[$value[1]];
+            $sqlData['scale_w'] = $value[2];
+            $sqlData['scale_h'] = $value[3];
+            $sqlData['price'] = $value[4];
+            $sqlData['tree_weight'] = $value[5];
+            $curing_proportion = array();
+            $i = 6;
+            foreach ($irrigation_list as $k => $val) {
+                array_push($curing_proportion,array('id'=>$val->id,'name'=>$val->name,'num'=>$value[$k+$i]));
+            }
+            $sqlData['curing_proportion'] = json_encode($curing_proportion);
+
+            $id = DB::table('tree_list')->insertGetId($sqlData);
+            $filepath = '/admin/uploads/erweima/'.date('Y-m');
+            if(!file_exists(public_path($filepath))){
+                mkdir(public_path($filepath));
+            }
+            QrCode::format('png')->size(200)->generate('http://www.baidu.com?treeid='.$id,public_path($filepath.'/'.$id.'.png'));
+            DB::table('tree_list')->where('id',$id)->update(array('erweima'=>$filepath.'/'.$id.'.png'));
+        }
+        
         fclose($file);
-        return $data;
+        return $res; 
     }
 
 

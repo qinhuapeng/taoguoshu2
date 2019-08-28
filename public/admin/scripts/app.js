@@ -140,6 +140,16 @@
                 }
             }).
 
+            when('/rechargeable_vouchers', {
+                templateUrl: 'views/rechargeable_vouchers.html',
+                controller: 'RechargeableVouchersCtrl',
+                resolve: {
+                    deps: ["$ocLazyLoad", function (a) {
+                        return a.load(["scripts/rechargeable_vouchers.js"])
+                    }]
+                }
+            }).
+
             when('/irrigation_set_edit/:id', {
                 templateUrl: 'views/irrigation_set_edit.html',
                 controller: 'IrrigationSetEditCtrl',
