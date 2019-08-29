@@ -140,6 +140,28 @@
                 }
             }).
 
+            when('/steal_level', {
+                templateUrl: 'views/steal_level.html',
+                controller: 'StealLevelCtrl',
+                resolve: {
+                    deps: ["$ocLazyLoad", function (a) {
+                        return a.load(["scripts/steal_level.js"])
+                    }]
+                }
+            }).
+            when('/about_us', {
+                templateUrl: 'views/about_us.html',
+                controller: 'AboutUsCtrl',
+                resolve: {
+                    deps: ["$ocLazyLoad", function (a) {
+                        return a.load(["scripts/about_us.js",
+                            "/library/angular/angular-ueditor/ueditor.config.js",
+                            "/library/angular/angular-ueditor/ueditor.all.js",
+                            "/library/angular/angular-ueditor/angular-ueditor.min.js",])
+                    }]
+                }
+            }).
+
             when('/rechargeable_vouchers', {
                 templateUrl: 'views/rechargeable_vouchers.html',
                 controller: 'RechargeableVouchersCtrl',

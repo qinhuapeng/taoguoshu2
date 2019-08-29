@@ -1,0 +1,94 @@
+<section class="content-header">
+  <h1>
+    基本配置
+    <small>储值卷</small>
+  </h1>
+<!--       <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+    <li class="active">Dashboard</li>
+  </ol> -->
+</section>
+<!-- Main content -->
+<section class="content" >
+
+<!--   <div class="row" style="margin-top:20px;">
+    <div class="col-xs-12">
+      <div class="qhp-col-xs-2">
+          <select selector model="itemsPerPage_index" options="itemsPerPage_list" value-attr="id" label-attr="name" multi="false" change="get_itemsPerPage_num(newValue,oldValue)"></select>
+      </div>
+      <div class="qhp-col-xs-2">
+          <select selector model="search.is_delete" options="base_status_map" value-attr="id" label-attr="name" placeholder="请选择基地状态" require="true"></select>
+      </div>
+      <div class="qhp-col-xs-2">
+          <input type="text" class="form-control qhp-search-input" placeholder="请输入基地名称" ng-model="search.name">
+      </div>
+
+      <div class="qhp-col-xs-2">
+        <button class="btn btn-primary" type="button" ng-click="query_click()"><i class="fa fa-search"></i>查询</button>
+      </div>
+      
+    
+    </div>
+  </div> -->
+    
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="box box-info">
+        <div class="box-header">
+          <h3 class="box-title">储值卷</h3>
+          <button type="button" class="btn btn-primary pull-right" ng-click="rechargeableVouchersEditModel(null)">新增储值卷</button>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+          <table id="example2" class="table table-bordered table-hover">
+            <thead>
+            <tr>
+              <th>ID</th>
+              <th>金额</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat = "row in list">
+              <td>{{row.id}}</td>
+              <td>{{row.price}}</td>
+              <td><button type="button" class="btn btn-default btn-sm" ng-click="status_change(row)"><i class="fa fa-square {{row.is_delete == 1?'text-green':'text-red'}}"></i>
+                  </button></td>
+              <td><small class="label label-info" ng-click="rechargeableVouchersEditModel(row)"><i class="fa fa-edit"></i>修改</small></td>
+            </tr>
+            </tbody>      
+          </table>
+
+        </div>
+      </div>
+      <!-- /.box -->
+    </div>
+  </div>
+</section>
+
+
+<script type="text/ng-template" id="rechargeableVouchersEditModel.html">
+  <form name="operationForm" ng-submit="submitForm(operationForm.$valid)" class="form-horizontal" novalidate>
+    <div class="modal-header">
+        <h3 class="modal-title">充值卷 新增\修改</h3>
+    </div>
+    <div class="modal-body">
+      <div class="box-body">
+        <div class="form-group">
+          <label class="col-sm-2 control-label">金额</label>
+
+          <div class="col-sm-10">
+            <input type="text" class="form-control" ng-model="rechargeableinfo.price" required>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-disabled="operationForm.$invalid || save_spinner_display" ng-click="confirm()">确定</button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">取消</button>
+    </div>
+  </form>
+</script>
+
+

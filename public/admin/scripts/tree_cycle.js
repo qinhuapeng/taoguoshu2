@@ -84,6 +84,29 @@ angular.module('myApp').controller('TreeCycleCtrl', function($scope, TreeCycleSe
         });
     }
 
+    $scope.irrigation_open_status_change = function(row)
+    {
+        var msg = "您确定要关闭特殊养护吗？";
+        if(row.irrigation_open == 0){
+            msg = "您确定要开启特殊养护吗吗？";
+        }
+
+        layer.confirm(msg, {
+          btn: ['确定','取消'] //按钮
+        }, function(){
+            TreeCycleService.irrigation_open_status(row).success(function (response) {
+                angular.forEach($scope.list, function(value,key,array){
+                    if(value.id == response.data.id) {
+                        $scope.list[key] = response.data;
+                    }
+                });
+                layer.msg(response.msg);
+            });
+        }, function(){
+
+        });
+    }
+
 }).service('TreeCycleService', ['$http', function ($http) {
     var getDada = function (search,currentPage,itemsPerPage) {
         var url = '/api/tree/tree_cycle';
@@ -126,6 +149,12 @@ angular.module('myApp').controller('TreeCycleCtrl', function($scope, TreeCycleSe
         return $http.post(url, data);
     };
 
+    var irrigation_open_status = function(cycleinfo)
+    {
+        var url = '/api/tree/irrigation_open_status';
+        var data = {cycleinfo:cycleinfo};
+        return $http.post(url, data);
+    };
 
 
 
@@ -148,6 +177,9 @@ angular.module('myApp').controller('TreeCycleCtrl', function($scope, TreeCycleSe
         },
         tree_base_list: function () {
             return tree_base_list();
+        },
+        irrigation_open_status: function (cycleinfo) {
+            return irrigation_open_status(cycleinfo);
         },
 
     };

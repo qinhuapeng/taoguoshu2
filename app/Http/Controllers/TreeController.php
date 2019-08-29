@@ -657,11 +657,27 @@ class TreeController extends Controller {
         if($params['catagory']['is_delete'] == 1){
             $is_delete = 2;
         }
-        DB::table('tree_catagory')->where('id',$params['catagory']['id'])->update(array('is_delete'=>$is_delete));
-        $params['catagory']['is_delete'] = $is_delete;
-        $res['data'] = $params['catagory'];
+        DB::table('cycleinfo')->where('id',$params['cycleinfo']['id'])->update(array('is_delete'=>$is_delete));
+        $params['cycleinfo']['is_delete'] = $is_delete;
+        $res['data'] = $params['cycleinfo'];
     END:
         return Response::json($res);  
+    }
+
+    public function irrigation_open_status()
+    {
+        $params = $this->getAngularjsParam(true);
+        $res['ret'] = 0;
+        $res['msg'] = 'ok';
+        $irrigation_open = 1;
+        if($params['cycleinfo']['irrigation_open'] == 1){
+            $irrigation_open = 0;
+        }
+        DB::table('tree_cycle')->where('id',$params['cycleinfo']['id'])->update(array('irrigation_open'=>$irrigation_open));
+        $params['cycleinfo']['irrigation_open'] = $irrigation_open;
+        $res['data'] = $params['cycleinfo'];
+    END:
+        return Response::json($res); 
     }
 
 

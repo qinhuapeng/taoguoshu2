@@ -1,0 +1,82 @@
+<section class="content-header">
+  <h1>
+    基本配置
+    <small>偷盗等级</small>
+  </h1>
+  
+</section>
+<!-- Main content -->
+<section class="content" >
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="box box-info">
+        <div class="box-header">
+          <h3 class="box-title">偷盗等级</h3>
+          <button type="button" class="btn btn-primary pull-right" ng-click="stealLevelEditModel(null)">新增等级</button>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+          <table id="example2" class="table table-bordered table-hover">
+            <thead>
+            <tr>
+              <th>ID</th>
+              <th>名称</th>
+              <th>所需分数</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat = "row in list">
+              <td>{{row.id}}</td>
+              <td>{{row.name}}</td>
+              <td>{{row.num}}</td>
+              <td><button type="button" class="btn btn-default btn-sm" ng-click="steal_level_status_change(row)"><i class="fa fa-square {{row.is_delete == 1?'text-green':'text-red'}}"></i>
+                  </button></td>
+              <td>
+                <small class="label label-info" ng-click="stealLevelEditModel(row)"><i class="fa fa-edit"></i>修改</small>
+              </td>
+            </tr>
+            </tbody>      
+          </table>
+        </div>
+        <!-- /.box-body -->
+      </div>
+      <!-- /.box -->
+    </div>
+  </div>
+
+</section>
+
+
+
+
+<script type="text/ng-template" id="stealLevelEditModel.html">
+  <form name="operationForm" ng-submit="submitForm(operationForm.$valid)" class="form-horizontal" novalidate>
+    <div class="modal-header">
+        <h3 class="modal-title">偷盗等级 新增/修改</h3>
+    </div>
+    <div class="modal-body">
+      <div class="box-body">
+        <div class="form-group">
+          <label class="col-sm-3 control-label">名称</label>
+
+          <div class="col-sm-9">
+            <input type="text" class="form-control" ng-model="levelinfo.name" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-3 control-label">所需分数</label>
+
+          <div class="col-sm-9">
+            <input type="text" class="form-control" ng-model="levelinfo.num" required>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-disabled="operationForm.$invalid || save_spinner_display" ng-click="confirm()">确定</button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">取消</button>
+    </div>
+  </form>
+</script>

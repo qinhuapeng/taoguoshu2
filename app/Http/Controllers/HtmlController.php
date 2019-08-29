@@ -26,211 +26,87 @@ class HtmlController extends Controller {
  		$this->logs_path = "html";
     }
 
-
-    public function all()
+    public function index()
     {
-        $params = Request::all();
-        $database = getenv('DB_DATABASE');        
         $res['ret'] = 0;
         $res['msg'] = 'ok';
-        $game_id = $params['game_id'];
-        $category_list = DB::table($database.'.game_category')->where($database.'.game_category.game_id',$game_id)->where($database.'.game_category.is_delete',0)->get([$database.'.game_category.*']);
-        $category_arr = [];
-        foreach ($category_list as $key => $value) {
-            $arr = explode("_",$value->mysql_table);
-            $category_list[$key]->catalog = "/pages/".$arr[count($arr)-1]."/index";
-            $category_list[$key]->child = array();
-        }
-        //DB::connection("mysql_other")->table("user")->where("id",$id)->update([]);
-        $servername = getenv('DB_HOST_'.$game_id);
-        $username = getenv('DB_USERNAME_'.$game_id);
-        $password = getenv('DB_PASSWORD_'.$game_id);
-
-        $conn = mysqli_connect($servername, $username, $password);
-        if(! $conn )
-        {
-            die('连接失败: ' . mysqli_error($conn));
-        }
-        // 设置编码，防止中文乱码
-        //mysqli_query($conn , "set names utf8");
-        //dd($category_list);
-        foreach ($category_list as $key => $value) {
-            $sql = "SELECT * FROM ".$value->mysql_table." order By id desc limit ".$value->show_num;
-            mysqli_select_db($conn,getenv('DB_DATABASE_'.$game_id));
-            $result = mysqli_query($conn,$sql);
-            if(!$result){
-                 dd(mysqli_errno($conn).': '.mysqli_error($conn));
-            }
-
-
-            while($row =$result->fetch_array(MYSQLI_ASSOC)){
-                $arr =explode("/",$value->catalog);
-                $row['catalog'] ="/pages/".$arr[2]."/info";
-                $category_list[$key]->child[] = $row;
-            }
-           
-        }
-        
-        mysqli_close($conn);
-
-        $game_list = DB::table($database.'.game_list')->where($database.'.game_list.id',$game_id)->get([$database.'.game_list.*'])[0];
-
-        $swiper_list = DB::table($database.'.swiper_list')->where($database.'.swiper_list.game_id',$game_id)->where($database.'.swiper_list.is_delete',0)->get([$database.'.swiper_list.*']);
-        foreach ($swiper_list as $key => $value) {
-            //https://m.019103.com/news/1263.html
-            $arr = explode("/",$value->url);
-            $swiper_list[$key]->catalog = "/pages/".$arr[count($arr)-2]."/info";
-            $swiper_list[$key]->action_id = explode(".",$arr[count($arr)-1])[0];
-        }    
-        // $res['recommend_list'] = array_values($recommend_list);
-        $res['swiper_list'] = $swiper_list;
-        $res['game_list'] = $game_list;
-        $res['category_list'] = $category_list;
-    END:
-        return Response::json($res);  
-    }
-
-
-    public function navlist()
-    {
         $params = Request::all();
-        $res['ret'] = 0;
-        $res['msg'] = 'ok';
-        $database = getenv('DB_DATABASE'); 
-        $category_id = (int)$params['actionid'];
-        $game_id = (int)$params['game_id'];
-        $pagenum = (int)$params['pagenum'];
-        // $category_id = 10;
-        // $game_id = 4;
-        // $pagenum = 1;
-        $category_list = DB::table($database.'.game_category')->where($database.'.game_category.game_id',$game_id)->where($database.'.game_category.is_delete',0)->get([$database.'.game_category.*']);
-
-        $servername = getenv('DB_HOST_'.$game_id);
-        $username = getenv('DB_USERNAME_'.$game_id);
-        $password = getenv('DB_PASSWORD_'.$game_id);
-
-        $conn = mysqli_connect($servername, $username, $password);
-        if(! $conn )
-        {
-            die('连接失败: ' . mysqli_error($conn));
+        //$openid = $params['openid'];
+        $openid = 'fe464eede6c2d1bef9609e5eac1742e8';
+        $data = array();
+        $tree_id_arr = array();
+        $data['steal_level'] = DB::table('wx_users as user')
+        						->leftJoin('steal_level as level','level.id','=','user.steal_level')
+        						->get(['user.*','level.name as steal_level_name']);
+        $irrigation_list = DB::table('irrigation_set')->get(['id','name','day']);
+        $tree_tabs = DB::table('tree_list as list')
+                    ->leftJoin('tree_base as base','base.id','=','list.base_id')
+                    ->leftJoin('tree_catagory as catagory','catagory.id','=','list.catagory_id')
+                    ->where('list.is_delete',1)
+                    ->where('list.status',1)
+                    ->where('openid',$openid)
+                    ->get(['list.*','catagory.name as catagory_name','catagory.code as code','base.name as base_name']);
+        foreach ($tree_tabs as $key => $value) {
+        	array_push($tree_id_arr,$value->id);
         }
-        // 设置编码，防止中文乱码
-        mysqli_query($conn , "set names utf8");
 
-        foreach ($category_list as $key => $value) {
-            //if($category_id == $value->id){
-                $arr = explode("_",$value->mysql_table);
-                $category_list[$key]->catalog = "/pages/".$arr[count($arr)-1]."/index";
-                $category_list[$key]->child_catalog = "/pages/".$arr[count($arr)-1]."/info";
-
-                $sql = "SELECT * FROM ".$value->mysql_table." order By id desc limit ".($pagenum-1)*$value->nav_num.",".$value->nav_num;
-                mysqli_select_db($conn,getenv('DB_DATABASE_'.$game_id));
-                $result = mysqli_query($conn,$sql);
-                if(!$result){
-                     dd(mysqli_errno($conn).': '.mysqli_error($conn));
-                }
-
-                while($row =$result->fetch_array(MYSQLI_ASSOC)){
-                    $category_list[$key]->child[] = $row;
-                }
-            //}
-           
+        $data['video_list'] = array();
+        $data['img_list'] = array();
+        $iv_tabs = DB::table('information_admin_img')->where('is_delete',0)->whereIn('tree_id',$tree_id_arr)->orderBy('id','desc')->get(['*']);
+        foreach ($iv_tabs as $key => $value) {
+        	if($value->type == 1){
+        		array_push($data['img_list'],$value);
+        	}else{
+				array_push($data['video_list'],$value);
+        	}
         }
-        
-        mysqli_close($conn);
-        $res['data'] = $category_list;
+        $tree_irrigation_tabs = DB::table('tree_list_irrigation_info as info')
+        			->leftJoin('tree_list as list','list.id','=','info.tree_id')
+        			->where('list.is_delete',1)
+        			->where('list.status',1)
+        			->where('info.openid',$openid)
+        			->orderBy('info.id','desc')
+        			->groupBy('info.irrigation_type')
+        			->groupBy('info.tree_id')
+        			->get([DB::raw('max(info.creattime) as irrigation_time'),'info.irrigation_type','info.tree_id','info.openid']);
+        $irrigation_list_day = $this->irrigation_list_day();
+
+        $tree_irrigation_data = array();
+        dd($tree_irrigation_tabs);
+        foreach ($tree_irrigation_tabs as $key => $value) {
+            $tree_id = $value->tree_id;
+            $tree_irrigation_data[$tree_id]['tree_id'] = $value->tree_id;
+            $tree_irrigation_data[$tree_id]['openid'] = $value->openid;
+            if(!isset($tree_irrigation_data[$tree_id]['child'])){
+                $tree_irrigation_data[$tree_id]['child'] = array();
+            }
+            $irrigation_type =$value->irrigation_type;
+            $tree_irrigation_data[$tree_id]['child'][$irrigation_type]['irrigation_type'] = $value->irrigation_type;
+            $tree_irrigation_data[$tree_id]['child'][$irrigation_type]['irrigation_time'] = $value->irrigation_time;
+            $tree_irrigation_data[$tree_id]['child'] = array_values($tree_irrigation_data[$tree_id]['child']);
+        }
+        $tree_irrigation_data = array_values($tree_irrigation_data);
+
+
+        dd($tree_irrigation_data);
+
+        foreach ($irrigation_list_day as $key => $value) {
+            
+        }
+        foreach ($tree_tabs as $key => $value) {
+            $tree_tabs[$key]->irrigation_list  = $irrigation_list;
+            $tree_tabs[$key]->irrigation_need = array();
+            foreach ($tree_irrigation_tabs as $k => $val) {
+                if($val->tree_id == $value->id){
+
+                }
+            }
+        }
+        dd($tree_irrigation_tabs);
+        $data['tree_list'] = $tree_tabs;
+        $res['data'] = $data;
     END:
         return Response::json($res); 
     }
-
-
-    public function get_onReach_navlist()
-    {
-        $params = Request::all();
-        $res['ret'] = 0;
-        $res['msg'] = 'ok';
-        $database = getenv('DB_DATABASE'); 
-        $category_id = (int)$params['actionid'];
-        $game_id = (int)$params['game_id'];
-        $pagenum = (int)$params['pagenum'];
-        $list = $params['list'][0];
-
-        $servername = getenv('DB_HOST_'.$game_id);
-        $username = getenv('DB_USERNAME_'.$game_id);
-        $password = getenv('DB_PASSWORD_'.$game_id);
-
-        $conn = mysqli_connect($servername, $username, $password);
-        if(! $conn )
-        {
-            die('连接失败: ' . mysqli_error($conn));
-        }
-        // 设置编码，防止中文乱码
-        mysqli_query($conn , "set names utf8");
-
-        $sql = "SELECT * FROM ".$list['mysql_table']." order By id desc limit ".($pagenum-1)*$list['nav_num'].",".$list['nav_num'];
-        mysqli_select_db($conn,getenv('DB_DATABASE_'.$game_id));
-        $result = mysqli_query($conn,$sql);
-        if(!$result){
-             dd(mysqli_errno($conn).': '.mysqli_error($conn));
-        }
-        $data = array();
-        while($row =$result->fetch_array(MYSQLI_ASSOC)){
-            $data[] = $row;
-        }
-           
-        
-        
-        mysqli_close($conn);
-        $res['data'] = $data;
-    END:
-        return Response::json($res);
-    }
-   
-
-   public function navinfo()
-   {
-        $params = Request::all();
-        $res['ret'] = 0;
-        $res['msg'] = 'ok';
-        $database = getenv('DB_DATABASE'); 
-        $infoid = (int)$params['infoid'];
-        $game_id = (int)$params['game_id'];
-        $mysql_table = $params['mysql_table'];
-
-        $servername = getenv('DB_HOST_'.$game_id);
-        $username = getenv('DB_USERNAME_'.$game_id);
-        $password = getenv('DB_PASSWORD_'.$game_id);
-
-        $conn = mysqli_connect($servername, $username, $password);
-        if(! $conn )
-        {
-            die('连接失败: ' . mysqli_error($conn));
-        }
-        // 设置编码，防止中文乱码
-        mysqli_query($conn , "set names utf8");
-
-        $sql = "SELECT ".$mysql_table.".*,".$mysql_table."_data_1.newstext FROM ".$mysql_table." inner join ".$mysql_table."_data_1  on ".$mysql_table."_data_1.id = ".$mysql_table.".id where ".$mysql_table.".id = ".$infoid;
-        mysqli_select_db($conn,getenv('DB_DATABASE_'.$game_id));
-        $result = mysqli_query($conn,$sql);
-        if(!$result){
-             dd(mysqli_errno($conn).': '.mysqli_error($conn));
-        }
-        $data = array();
-        while($row =$result->fetch_array(MYSQLI_ASSOC)){
-            $row['newstime'] = date("Y-m-d",$row['newstime']);
-            // $row['newstext'] = strip_tags(htmlspecialchars_decode($row['newstext']));
-            $row['newstext'] = str_replace('img src=\"https', 'img src="https', $row['newstext']);
-            $row['newstext'] = str_replace('img src="\https', 'img src="https', $row['newstext']);            
-            $row['newstext'] = str_replace('jpg\"', 'jpg"', $row['newstext']);
-            $data[] = $row;
-        }
-           
-        
-        
-        mysqli_close($conn);
-        $res['data'] = $data;
-    END:
-        return Response::json($res);
-   }
 
 }

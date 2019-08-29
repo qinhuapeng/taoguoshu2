@@ -45,6 +45,7 @@
                 <th scope="col">果树类别</th>
                 <th scope="col">基地名称</th>
                 <th scope="col">生长周期</th>
+                <th scope="col">特殊养护状态</th>
                 <th scope="col" class="align-center hide-on-mobile-portrait">操作</th>
             </tr>
             </thead>
@@ -55,6 +56,8 @@
                 <td>{{row.catagory_name}}</td>
                 <td>{{row.base_name}}</td>
                 <td>{{row.starttime}} / {{row.endtime}}</td>
+                <td><button type="button" class="btn btn-default btn-sm" ng-click="irrigation_open_status_change(row)"><i class="fa fa-square {{row.irrigation_open == 1?'text-green':'text-red'}}"></i>
+                  </button></td>
                 <td><small class="label label-info" ng-click="treeCycleEditModel(row)"><i class="fa fa-edit"></i>修改</small></td>
             </tr>
             </tbody>      

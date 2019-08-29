@@ -189,6 +189,86 @@ class SettingController extends Controller {
     }
 
 
+    public function about_us()
+    {
+        $params = $this->getAngularjsParam(true);
+
+        $res['ret'] = 0;
+        $res['msg'] = 'ok';
+        $res['data'] = DB::table('about_us')->get(['*']);
+    END:
+        return Response::json($res);  
+    }
+
+    public function about_us_edit()
+    {
+        $params = $this->getAngularjsParam(true);
+
+        $res['ret'] = 0;
+        $res['msg'] = 'ok';
+        DB::table('about_us')->update(array('content'=>$params['content']));
+        $res['data'] = $params;
+    END:
+        return Response::json($res);  
+    }
+
+
+
+
+    public function steal_level()
+    {
+        $params = $this->getAngularjsParam(true);
+        $res['ret'] = 0;
+        $res['msg'] = 'ok';
+        $res['data'] = DB::table('steal_level')->get(['*']);
+    END:
+        return Response::json($res);  
+    }
+
+
+    public function steal_level_add()
+    {
+        $params = $this->getAngularjsParam(true);
+        $res['ret'] = 0;
+        $res['msg'] = 'ok';
+        $params['levelinfo']['id'] = DB::table('steal_level')->insertGetId($params['levelinfo']);
+        $params['levelinfo']['is_delete'] = 1;
+        $res['data'] = $params['levelinfo'];
+    END:
+        return Response::json($res);  
+    }
+
+
+    public function steal_level_edit()
+    {
+        $params = $this->getAngularjsParam(true);
+        $res['ret'] = 0;
+        $res['msg'] = 'ok';
+
+        DB::table('steal_level')->where('id',$params['levelinfo']['id'])->update($params['levelinfo']);
+        $res['data'] = $params['levelinfo'];
+    END:
+        return Response::json($res);  
+    }
+
+    public function steal_level_remove()
+    {
+        $params = $this->getAngularjsParam(true);
+        $res['ret'] = 0;
+        $res['msg'] = 'ok';
+        $is_delete = 1;
+        if($params['levelinfo']['is_delete'] == 1){
+            $is_delete = 2;
+        }
+        DB::table('steal_level')->where('id',$params['levelinfo']['id'])->update(array('is_delete'=>$is_delete));
+        $params['levelinfo']['is_delete'] = $is_delete;
+        $res['data'] = $params['levelinfo'];
+    END:
+        return Response::json($res);  
+    }
+
+
+
 }
 
 

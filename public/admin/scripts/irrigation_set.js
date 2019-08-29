@@ -4,6 +4,7 @@ angular.module('myApp').controller('IrrigationSetCtrl', function($scope, Irrigat
     $scope.init_spinner_display = true;
     $scope.list = [];
     $scope.data_loading = true;
+    $scope.type_map = ['','日常养护','特殊养护'];
     function int_data()
     {
        IrrigationSetService.getDada($scope.search,$scope.currentPage,$scope.itemsPerPage).success(function(response){

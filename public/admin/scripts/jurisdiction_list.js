@@ -2,6 +2,7 @@ angular.module('myApp').controller('JurisdictionCtrl', function($scope, Jurisdic
     $scope.usersinfo = {};
     $scope.usersinfo.role_id = 0;
     $scope.init_spinner_display = true;
+    
     function int_data()
     {
        JurisdictionService.getDada().success(function(response){

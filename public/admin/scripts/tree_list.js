@@ -382,8 +382,12 @@ angular.module('myApp').controller('treeListEditModelCtrl', function ($scope, tr
         $scope.save_spinner_display = true;
         var all_num = 0;
         angular.forEach($scope.irrigation,function(value,key,array){
-            all_num  = all_num*1 + value*1;
+            if(key <=3){
+                all_num  = all_num*1 + value*1;
+            }
+            
         });
+        alert(all_num);
         if(all_num != 100){
             layer.msg('养护比例错误！');
             $scope.save_spinner_display = false;

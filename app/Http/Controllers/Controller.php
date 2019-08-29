@@ -242,7 +242,7 @@ class Controller extends BaseController
     //获取养护产品
     public function irrigation_list()
     {
-        $tabs = DB::table('irrigation_set')->get(['*'])->toArray();
+        $tabs = DB::table('irrigation_set')->where('type',1)->get(['*'])->toArray();
         return $tabs;
     }
 
@@ -252,6 +252,16 @@ class Controller extends BaseController
         $tabs = $this->irrigation_list();
         foreach ($tabs as $key => $value) {
             $data[$value->id] = $value->name;
+        }
+        return $data;
+    }
+
+    public function irrigation_list_day()
+    {
+        $data = array();
+        $tabs = $this->irrigation_list();
+        foreach ($tabs as $key => $value) {
+            $data[$value->id] = $value->day;
         }
         return $data;
     }

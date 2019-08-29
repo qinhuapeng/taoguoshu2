@@ -70,10 +70,9 @@ class CustomerController extends Controller {
         
 
         //拥有果树数量
-        $tree_tabs = DB::table('tree_list_info as info')
-                    ->leftJoin('tree_list as list','list.id','=','info.tree_id')
+        $tree_tabs = DB::table('tree_list as list')
                     ->where('list.is_delete',1)->where('status',1)
-                    ->whereIn('info.openid',$openid_arr)->groupBy('info.openid')->get(['info.openid',DB::raw('count(info.id) as num')]);
+                    ->whereIn('list.openid',$openid_arr)->groupBy('list.openid')->get(['list.openid',DB::raw('count(list.id) as num')]);
         
         foreach ($tabs['data'] as $key => $value) {
             foreach ($tree_tabs as $t_key => $t_value) {

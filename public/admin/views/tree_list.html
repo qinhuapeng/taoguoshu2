@@ -81,7 +81,9 @@
                 <td><button type="button" class="btn btn-default btn-sm" ng-click="tree_list_status_change(row)"><i class="fa fa-square {{row.is_delete == 1?'text-green':'text-red'}}"></i>
                   </button></td>
                 <td>
-                  <div class="col-xs-12" ng-repeat="r in row.curing_proportion">{{r.name}}:{{r.num}}</div>
+                  <div class="col-xs-12" ng-repeat="(k,r) in row.curing_proportion">
+                    {{r.name}}:<span ng-if="k<=3">{{r.num}}%</span><span ng-if="k>3">{{r.num}}元</span>
+                  </div>
                 </td>
                 <td><img ng-src="{{row.erweima}}" class="qhp-td-img-70-70"/></td>
                 <td><small class="label label-info" ng-click="treeListEditModel(row)"><i class="fa fa-edit"></i>修改</small></td>

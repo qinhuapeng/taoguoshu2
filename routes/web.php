@@ -44,6 +44,8 @@ Route::any('api/admin/role_jurisdictions_one', 'AdminController@role_jurisdictio
 
 
 //基本配置
+Route::any('api/setting/about_us', 'SettingController@about_us');
+Route::any('api/setting/about_us_edit', 'SettingController@about_us_edit');
 Route::any('api/setting/probability_set', 'SettingController@probability_set');
 Route::any('api/setting/probability_set_edit', 'SettingController@probability_set_edit');
 Route::any('api/setting/irrigation_set', 'SettingController@irrigation_set');
@@ -54,6 +56,10 @@ Route::any('api/setting/rechargeable_vouchers_list', 'SettingController@recharge
 Route::any('api/setting/rechargeable_vouchers_add', 'SettingController@rechargeable_vouchers_add');
 Route::any('api/setting/rechargeable_vouchers_edit', 'SettingController@rechargeable_vouchers_edit');
 Route::any('api/setting/rechargeable_vouchers_remove', 'SettingController@rechargeable_vouchers_remove');
+Route::any('api/setting/steal_level', 'SettingController@steal_level');
+Route::any('api/setting/steal_level_add', 'SettingController@steal_level_add');
+Route::any('api/setting/steal_level_edit', 'SettingController@steal_level_edit');
+Route::any('api/setting/steal_level_remove', 'SettingController@steal_level_remove');
 
 
 //我的果树
@@ -80,6 +86,7 @@ Route::any('api/tree/tree_list_add', 'TreeController@tree_list_add');
 Route::any('api/tree/tree_list_edit', 'TreeController@tree_list_edit');
 Route::any('api/tree/tree_list_remove', 'TreeController@tree_list_remove');
 Route::any('api/tree/tree_scale_list', 'TreeController@tree_scale_list');
+Route::any('api/tree/irrigation_open_status', 'TreeController@irrigation_open_status');
 Route::any('api/tree/down_csv', 'TreeController@down_csv');
 Route::any('api/tree/uploadcsv', 'TreeController@uploadcsv');
 
@@ -109,3 +116,7 @@ Route::any('api/common/tree_base_list', 'Controller@tree_base_list');
 /*前端*/
 //微信
 Route::any('api/wx/get_WX_config', 'WxController@get_WX_config');
+Route::any('api/wx/login', 'WxController@login');
+
+//小程序页面内容
+Route::any('api/html/index', 'HtmlController@index');
