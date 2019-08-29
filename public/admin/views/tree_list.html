@@ -82,7 +82,7 @@
                   </button></td>
                 <td>
                   <div class="col-xs-12" ng-repeat="(k,r) in row.curing_proportion">
-                    {{r.name}}:<span ng-if="k<=3">{{r.num}}%</span><span ng-if="k>3">{{r.num}}元</span>
+                    {{r.name}}:<span ng-if="r.type == 1">{{r.num}}%</span><span ng-if="r.type==2">{{r.num}}元</span>
                   </div>
                 </td>
                 <td><img ng-src="{{row.erweima}}" class="qhp-td-img-70-70"/></td>

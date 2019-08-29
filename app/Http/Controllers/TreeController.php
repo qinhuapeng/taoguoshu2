@@ -722,6 +722,7 @@ class TreeController extends Controller {
         foreach ($tabs['data'] as $key => $value) {
             $tabs['data'][$key]->curing_proportion = json_decode($value->curing_proportion,true);
         }
+        //dd($tabs['data']);
         $res['data'] = $tabs;
     END:
         return Response::json($res);  
@@ -1025,7 +1026,10 @@ class TreeController extends Controller {
             $i = 6;
             $num = 0;
             foreach ($irrigation_list as $k => $val) {
-                $num += $value[$k+$i];
+                if($k <= 3){
+                    $num += $value[$k+$i];
+                }
+                
             }
             if($num != 100){
                 $flag = false;

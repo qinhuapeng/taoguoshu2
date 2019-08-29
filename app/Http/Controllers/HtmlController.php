@@ -71,38 +71,50 @@ class HtmlController extends Controller {
         			->get([DB::raw('max(info.creattime) as irrigation_time'),'info.irrigation_type','info.tree_id','info.openid']);
         $irrigation_list_day = $this->irrigation_list_day();
 
-        $tree_irrigation_data = array();
-        dd($tree_irrigation_tabs);
-        foreach ($tree_irrigation_tabs as $key => $value) {
-            $tree_id = $value->tree_id;
-            $tree_irrigation_data[$tree_id]['tree_id'] = $value->tree_id;
-            $tree_irrigation_data[$tree_id]['openid'] = $value->openid;
-            if(!isset($tree_irrigation_data[$tree_id]['child'])){
-                $tree_irrigation_data[$tree_id]['child'] = array();
-            }
-            $irrigation_type =$value->irrigation_type;
-            $tree_irrigation_data[$tree_id]['child'][$irrigation_type]['irrigation_type'] = $value->irrigation_type;
-            $tree_irrigation_data[$tree_id]['child'][$irrigation_type]['irrigation_time'] = $value->irrigation_time;
-            $tree_irrigation_data[$tree_id]['child'] = array_values($tree_irrigation_data[$tree_id]['child']);
-        }
-        $tree_irrigation_data = array_values($tree_irrigation_data);
+        $tree_list = DB::table('tree_list as list')
+                    ->leftJoin('tree_cycle as cycle', function ($join) {
+                        $join->on('cycle.base_id', '=', 'list.base_id')
+                        ->on('cycle.catagory_id', '=', 'list.catagory_id');
+                    })
+                    ->where('list.is_delete',1)->where('list.status',1)
+                    ->where('openid',$openid)
+                    ->get(['list.*','cycle.irrigation_open']);
 
 
-        dd($tree_irrigation_data);
-
-        foreach ($irrigation_list_day as $key => $value) {
-            
-        }
-        foreach ($tree_tabs as $key => $value) {
-            $tree_tabs[$key]->irrigation_list  = $irrigation_list;
-            $tree_tabs[$key]->irrigation_need = array();
-            foreach ($tree_irrigation_tabs as $k => $val) {
-                if($val->tree_id == $value->id){
-
+        foreach ($tree_list as $key => $value) {
+            $curing_proportion = json_decode($value->curing_proportion,true);
+            foreach ($curing_proportion as $cp_key => $cp_value) {
+                $curing_proportion[$cp_key]['irrigation_time'] = $value->steal_time;
+                $curing_proportion[$cp_key]['is_irrigation'] = false;
+                foreach ($tree_irrigation_tabs as $k => $val) {
+                    if($val->tree_id == $value->id){
+                        if($val->irrigation_type == $cp_value['id']){
+                            $curing_proportion[$cp_key]['irrigation_time'] = $val->irrigation_time;
+                        }
+                    }
                 }
+                $tree_list[$key]->curing_proportion = $curing_proportion;
             }
         }
-        dd($tree_irrigation_tabs);
+
+        foreach ($tree_list as $key => $value) {
+            foreach ($value->curing_proportion as $k => $val) {
+                $now = date('Y-m-d H:i:s');
+                if($k <= 3){
+                    $limit_day = $this->time_interval($val['irrigation_time'],$now)['day'] - $irrigation_list_day[$val['id']];
+                    if($limit_day >= 0){
+                        $tree_list[$key]->curing_proportion[$k]['is_irrigation'] = true;
+                    }
+                }else{
+                    if($value->irrigation_open == 1){
+                        $tree_list[$key]->curing_proportion[$k]['is_irrigation'] = true;
+                    }
+                }
+                
+            }
+        }
+
+        dd($tree_list);
         $data['tree_list'] = $tree_tabs;
         $res['data'] = $data;
     END:

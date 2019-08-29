@@ -320,6 +320,7 @@ angular.module('myApp').controller('uploadModelCtrl', function ($scope, uploadin
 
 angular.module('myApp').controller('treeListEditModelCtrl', function ($scope, treelist,tree_base_list,tree_catagory_list,TreeListService, $uibModalInstance) {
     $scope.scale_list = [];
+    console.log(JSON.stringify(treelist));
     function tree_scale_list($type,treelist)
     {
         TreeListService.tree_scale_list($type,treelist).success(function (response) {
@@ -381,13 +382,20 @@ angular.module('myApp').controller('treeListEditModelCtrl', function ($scope, tr
     {   
         $scope.save_spinner_display = true;
         var all_num = 0;
-        angular.forEach($scope.irrigation,function(value,key,array){
-            if(key <=3){
-                all_num  = all_num*1 + value*1;
-            }
-            
+        var ir = [];
+        angular.forEach($scope.irrigation_list,function(value,key,array){
+            angular.forEach($scope.irrigation,function(val,k,arr){
+                if(k*1+1*1 == value.id){
+                    if(value.type == 1){
+                        if($.inArray(value.id, ir) == -1){
+                            all_num  = all_num*1 + val*1;
+                            ir.push(value.id);
+                        } 
+                    }
+                }
+            });
         });
-        alert(all_num);
+        
         if(all_num != 100){
             layer.msg('养护比例错误！');
             $scope.save_spinner_display = false;
@@ -395,7 +403,7 @@ angular.module('myApp').controller('treeListEditModelCtrl', function ($scope, tr
         }else{
             $scope.irrigation_data = [];
             angular.forEach($scope.irrigation_list,function(value,key,array){
-                $scope.irrigation_data.push({'id':value.id,'name':value.name});
+                $scope.irrigation_data.push({'id':value.id,'name':value.name,'type':value.type});
                 angular.forEach($scope.irrigation,function(val,k,arr){
                     $scope.irrigation_data[key].num = arr[key];
                 });
