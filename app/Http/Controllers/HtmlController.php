@@ -72,13 +72,14 @@ class HtmlController extends Controller {
         $irrigation_list_day = $this->irrigation_list_day();
 
         $tree_list = DB::table('tree_list as list')
+                    ->leftJoin('tree_catagory as catagory','catagory.id','=','list.catagory_id')
                     ->leftJoin('tree_cycle as cycle', function ($join) {
                         $join->on('cycle.base_id', '=', 'list.base_id')
                         ->on('cycle.catagory_id', '=', 'list.catagory_id');
                     })
                     ->where('list.is_delete',1)->where('list.status',1)
                     ->where('openid',$openid)
-                    ->get(['list.*','cycle.irrigation_open','cycle.starttime','cycle.endtime']);
+                    ->get(['list.*','cycle.irrigation_open','cycle.starttime','cycle.endtime','catagory.code']);
 
         foreach ($tree_list as $key => $value) {
             $curing_proportion = json_decode($value->curing_proportion,true);
@@ -96,9 +97,10 @@ class HtmlController extends Controller {
                 $tree_list[$key]->curing_proportion = $curing_proportion;
             }
         }
-        //dd($value->curing_proportion);
         foreach ($tree_list as $key => $value) {
             $tree_list[$key]->irrigation_price = "0.00";
+            $tree_list[$key]->scale_w = $value->scale_w<10?'0'.$value->scale_w:$value->scale_w;
+            $tree_list[$key]->scale_h = $value->scale_h<10?'0'.$value->scale_h:$value->scale_h;
             foreach ($value->curing_proportion as $k => $val) {
                 $now = date('Y-m-d H:i:s');
                 if($val['type'] == 1){
@@ -116,8 +118,9 @@ class HtmlController extends Controller {
                 
             }
         }
-        $data['tree_list'] = $tree_tabs;
+        $data['tree_list'] = $tree_list;
         $res['data'] = $data;
+        dd($data);
     END:
         return Response::json($res); 
     }
