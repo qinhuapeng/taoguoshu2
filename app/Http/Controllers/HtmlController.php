@@ -78,11 +78,11 @@ class HtmlController extends Controller {
                     })
                     ->where('list.is_delete',1)->where('list.status',1)
                     ->where('openid',$openid)
-                    ->get(['list.*','cycle.irrigation_open']);
-
+                    ->get(['list.*','cycle.irrigation_open','cycle.starttime','cycle.endtime']);
 
         foreach ($tree_list as $key => $value) {
             $curing_proportion = json_decode($value->curing_proportion,true);
+            $curing_proportion = $this->irrigation_price($value->id,$value->price,$value->steal_time,$curing_proportion,$value->starttime,$value->endtime);
             foreach ($curing_proportion as $cp_key => $cp_value) {
                 $curing_proportion[$cp_key]['irrigation_time'] = $value->steal_time;
                 $curing_proportion[$cp_key]['is_irrigation'] = false;
@@ -96,29 +96,62 @@ class HtmlController extends Controller {
                 $tree_list[$key]->curing_proportion = $curing_proportion;
             }
         }
-
+        //dd($value->curing_proportion);
         foreach ($tree_list as $key => $value) {
+            $tree_list[$key]->irrigation_price = "0.00";
             foreach ($value->curing_proportion as $k => $val) {
                 $now = date('Y-m-d H:i:s');
-                if($k <= 3){
+                if($val['type'] == 1){
                     $limit_day = $this->time_interval($val['irrigation_time'],$now)['day'] - $irrigation_list_day[$val['id']];
                     if($limit_day >= 0){
                         $tree_list[$key]->curing_proportion[$k]['is_irrigation'] = true;
+                        $tree_list[$key]->irrigation_price += $val['price'];
                     }
                 }else{
                     if($value->irrigation_open == 1){
                         $tree_list[$key]->curing_proportion[$k]['is_irrigation'] = true;
+                        $tree_list[$key]->irrigation_price += $val['price'];
                     }
                 }
                 
             }
         }
-
-        dd($tree_list);
         $data['tree_list'] = $tree_tabs;
         $res['data'] = $data;
     END:
         return Response::json($res); 
+    }
+
+
+    public function irrigation_price($tree_id,$price,$steal_time,$curing_proportion,$starttime,$endtime)
+    {
+        $irrigation_id_arr = array();
+        foreach ($curing_proportion as $key => $value) {
+            if($value['type'] == 2){
+                $price -= $value['num'];
+            }else{
+                array_push($irrigation_id_arr,$value['id']);
+            }
+        }
+        $tabs = DB::table('tree_list_irrigation_info')->where('tree_id',$tree_id)->whereIn('irrigation_type',$irrigation_id_arr)->get(['*']);
+        if(count($tabs) > 0){
+            foreach ($tabs as $key => $value) {
+                $price -= $value->irrigation_price;
+            }
+        }
+        //获取还有多少天
+        $day_arr = $this->time_interval($steal_time,$endtime);
+        
+        $day_sy = $day_arr['hour']/24+$day_arr['day'];
+        $irrigation_list_day = $this->irrigation_list_day();
+        foreach ($curing_proportion as $key => $value) {
+            if($value['type'] == 2){
+                $curing_proportion[$key]['price'] = $value['num'];
+            }else{
+                $curing_proportion[$key]['price']=round($price*$value['num']/100*$irrigation_list_day[$value['id']]/$day_sy,2);
+            }
+        }
+        return $curing_proportion;
     }
 
 }

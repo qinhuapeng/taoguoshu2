@@ -927,7 +927,7 @@ class TreeController extends Controller {
         // 创建并打开“tree.csv”文件进行写入
         $file = fopen($filename, 'w');
         // 保存列标题
-        $irrigation_list = $this->irrigation_list();
+        $irrigation_list = DB::table('irrigation_set')->get(['*']);
         $header = array($bom.'果树种类','基地名称','横排','纵排','总价','重量');
         foreach ($irrigation_list as $key => $value) {
             array_push($header,$value->name);
@@ -998,7 +998,7 @@ class TreeController extends Controller {
         }
         $data = eval('return ' . iconv('gbk', 'utf-8', var_export($data, true)) . ';');
 
-        $irrigation_list = $this->irrigation_list();
+        $irrigation_list = DB::table('irrigation_set')->get(['*']);
         $tree_catagory_list_id = $this->tree_catagory_list_id();
         $tree_base_list_id = $this->tree_base_list_id();
         //先判断数据准确性
@@ -1060,7 +1060,7 @@ class TreeController extends Controller {
             $curing_proportion = array();
             $i = 6;
             foreach ($irrigation_list as $k => $val) {
-                array_push($curing_proportion,array('id'=>$val->id,'name'=>$val->name,'num'=>$value[$k+$i]));
+                array_push($curing_proportion,array('id'=>$val->id,'name'=>$val->name,'type'=>$val->type,'num'=>$value[$k+$i]));
             }
             $sqlData['curing_proportion'] = json_encode($curing_proportion);
 

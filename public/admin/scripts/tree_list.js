@@ -1,3 +1,4 @@
+
 angular.module('myApp').controller('TreeListCtrl', function($scope, TreeListService, $location, $routeParams , $uibModal) {
     $scope.currentPage = 1;//当前页面
     $scope.itemsPerPage_list = [{'id':1,'name':20},{'id':2,'name':50},{'id':3,'name':100},{'id':4,'name':500},{'id':5,'name':1000}];
@@ -474,7 +475,3 @@ angular.module('myApp').controller('treeListEditModelCtrl', function ($scope, tr
     }
     
 })
-
-
-
-
