@@ -35,9 +35,16 @@ class HtmlController extends Controller {
         $openid = 'fe464eede6c2d1bef9609e5eac1742e8';
         $data = array();
         $tree_id_arr = array();
+
+        //积分通知
+        $integral_tips = DB::table('integral_list')->where('openid',$openid)->where('time',date('Y-m-d'))->count();
+        //基本配置
+        $probability_set = DB::table('probability_set')->get(['*'])[0];
+        //用户信息
         $data['steal_level'] = DB::table('wx_users as user')
         						->leftJoin('steal_level as level','level.id','=','user.steal_level')
         						->get(['user.*','level.name as steal_level_name']);
+        //养护工具列表
         $irrigation_list = DB::table('irrigation_set')->get(['id','name','day']);
         $tree_tabs = DB::table('tree_list as list')
                     ->leftJoin('tree_base as base','base.id','=','list.base_id')
@@ -50,6 +57,7 @@ class HtmlController extends Controller {
         	array_push($tree_id_arr,$value->id);
         }
 
+        //管理员针对每棵树上传的图片和视频
         $data['video_list'] = array();
         $data['img_list'] = array();
         $iv_tabs = DB::table('information_admin_img')->where('is_delete',0)->whereIn('tree_id',$tree_id_arr)->orderBy('id','desc')->get(['*']);
@@ -73,13 +81,14 @@ class HtmlController extends Controller {
 
         $tree_list = DB::table('tree_list as list')
                     ->leftJoin('tree_catagory as catagory','catagory.id','=','list.catagory_id')
+                    ->leftJoin('tree_base as base','base.id','=','list.base_id')
                     ->leftJoin('tree_cycle as cycle', function ($join) {
                         $join->on('cycle.base_id', '=', 'list.base_id')
                         ->on('cycle.catagory_id', '=', 'list.catagory_id');
                     })
                     ->where('list.is_delete',1)->where('list.status',1)
                     ->where('openid',$openid)
-                    ->get(['list.*','cycle.irrigation_open','cycle.starttime','cycle.endtime','catagory.code']);
+                    ->get(['list.*','cycle.irrigation_open','cycle.starttime','cycle.endtime','catagory.code','base.name as base_name']);
 
         foreach ($tree_list as $key => $value) {
             $curing_proportion = json_decode($value->curing_proportion,true);
@@ -120,7 +129,6 @@ class HtmlController extends Controller {
         }
         $data['tree_list'] = $tree_list;
         $res['data'] = $data;
-        dd($data);
     END:
         return Response::json($res); 
     }
